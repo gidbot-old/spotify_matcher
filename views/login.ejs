@@ -10,13 +10,33 @@
 
 </head>
 
+
+<style type="text/css">
+	body {
+		font-family: Menlo, 'Andale Mono', monospace;
+	}	
+
+	h2 {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 75px;
+	}
+
+	.buttons {
+		text-align: center; 
+		margin-top: 25px;
+	}
+
+</style>
+
+
 <script>
 $(function() {
 
 	var spotifyApi = new SpotifyWebApi();
 	spotifyApi.setAccessToken('<%- token %>');
 
-	var user;
+	var userDetails;
 	var id; 
 	var dw_id; 
 	var tracks = {};
@@ -26,7 +46,7 @@ $(function() {
 
 	spotifyApi.getMe().then(function (data) {
 		id = data.id;
-		user = {
+		userDetails = {
 			display_name: data.display_name,
 			email: data.email,
 			profile_pic: data.images[0].url
@@ -67,7 +87,7 @@ $(function() {
 		statusBar.style.width = "80%";
 		var user = {
 			spotify_id: id, 
-			details: user, 
+			details: userDetails, 
 			dw_spotify_id: dw_id,
 			tracks: tracks, 
 			artists: artists,
@@ -77,7 +97,7 @@ $(function() {
 		$.post( "/add-user", user)
 		  .done(function (data) {
 		    statusBar.style.width = "100%";
-			window.location.replace("/login");
+			window.location.replace("/");
 		}).fail(function (data){
 			console.log('Failure')
 		}) ;
@@ -88,13 +108,17 @@ $(function() {
 });
 </script>
 
-<div class="container">
-  <h2>Basic Progress Bar</h2>
-  <div class="progress">
-    <div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-      <span class="sr-only">70% Complete</span>
+<body>
+	<h2> 
+		Discover Weekly Matcher
+	</h2>
+
+	<div class="container">
+  	<h4> Adding Spotify Discover Weekly Playlist </h4>
+  	<div class="progress">
+    	<div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:0%">
     </div>
   </div>
 </div>
-
+</body>
 </html>

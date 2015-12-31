@@ -3,7 +3,7 @@ $(function() {
 	var spotifyApi = new SpotifyWebApi();
 	spotifyApi.setAccessToken('<%- token %>');
 
-	var user;
+	var userDetails;
 	var id; 
 	var dw_id; 
 	var tracks = {};
@@ -13,11 +13,12 @@ $(function() {
 
 	spotifyApi.getMe().then(function (data) {
 		id = data.id;
-		user = {
+		userDetails = {
 			display_name: data.display_name,
 			email: data.email,
 			profile_pic: data.images[0].url
 		}
+		console.log('User Details', userDetails); 
 		statusBar.style.width = "15%";
 		return id;
 	})
@@ -54,7 +55,7 @@ $(function() {
 		statusBar.style.width = "80%";
 		var user = {
 			spotify_id: id, 
-			details: user, 
+			details: userDetails, 
 			dw_spotify_id: dw_id,
 			tracks: tracks, 
 			artists: artists,

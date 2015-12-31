@@ -1,0 +1,41 @@
+<html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+
+<style type="text/css">
+	body {
+		font-family: Menlo, 'Andale Mono', monospace;
+	}	
+
+	h2 {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 75px;
+	}
+
+	.buttons {
+		text-align: center; 
+		margin-top: 25px;
+	}
+
+</style>
+
+<body>
+	<h2> 
+		Discover Weekly Matcher
+	</h2>
+
+	<div class = "col-lg-12 buttons">
+		<% if (!loggedIn) { %>
+			<a href='/login' class="btn btn-lg btn-info" role="button"> Login with Spotify </a>
+		<% } else { %>
+			<a href='/discover' class="btn btn-lg btn-success" role="button"> Discover </a>
+		<% } %> 
+	</div>
+
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+<html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src= "/js/spotify.js"></script>
+
+</head>
+
+<script> 
+$(function() {
+
+	var spotifyApi = new SpotifyWebApi();
+	spotifyApi.setAccessToken('<%- token %>');
+
+	spotifyApi.getMe().then(function (data) {
+		$('.current-user-name').text(data.display_name);
+		$('.current-profile-pic').css('background-image', 'url(' + data.images[0].url + ')');
+
+	});
+
+	spotifyApi.getUser('<%- otherId %>').then(function (data) {
+		$('.other-user-name').text(data.display_name);
+		$('.other-profile-pic').css('background-image', 'url(' + data.images[0].url + ')');
+	});
+
+	// spotifyApi.getPlaylistTracks('spotifydiscover', '<%- currentDwId %>').then(function (data) {
+	// 	var table = document.getElementById("current-playlist");
+	// 	for (var i =0; i < data.items.length; i++) {
+	// 		var row = table.insertRow(i+1);
+	// 		var cell1 = row.insertCell(0);
+	// 		var cell2 = row.insertCell(1);
+	// 		cell1.innerHTML = data.items[i].track.artists[0].name;
+	// 		cell2.innerHTML = data.items[i].track.name;
+	// 	}
+	// }); 
+
+	spotifyApi.getPlaylistTracks('spotifydiscover', '<%- otherDwId %>').then(function (data) {
+		console.log(data); 
+	}); 
+
+	console.log($('.vs-container').height());
+	var vsHeight = 150 - $('.vs-container').height()/2; 
+	$('.vs-container').css('margin-top', vsHeight+"px");
+
+
+});
+</script>
+
+
+<style type="text/css">
+	body {
+		font-family: Menlo, 'Andale Mono', monospace;
+	}	
+	a { 
+		color: #1ed760
+	}
+	h2 {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 75px;
+	}
+
+	h3 { 
+		text-align: center;
+		font-size: 24px;
+		margin-top: 20px;
+	} 
+
+	.profile-container { 
+		text-align: center;
+		margin-top: 50px;
+	}
+
+	.vs-container {
+		text-align: center;
+		font-size: 14px;
+	}
+
+	.profile-pic {
+		width: 200px; 
+		height: 200px;
+	}
+
+	.playlist-container {
+		margin-top: 20px; 
+		margin-bottom: 20px;
+	}
+
+</style>
+
+<body>
+	<h2> 
+		Discover Weekly Matcher
+	</h2> 
+
+	<div class = "col-md-4 profile-container">
+		<img src="/img/hollow_circle.png" class="profile-pic current-profile-pic">
+		<h3 class="user-name current-user-name"></h3>
+		<div class="playlist-container">
+			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- currentDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
+		</div>
+	</div>
+
+	<div class = "col-md-4 vs-container">
+		
+		<b style="font-size: 20px;"> Match: <%= percent %>%  </b> 
+		<br> <br>   
+		<b> Artists in Common: </b> 
+		<br> 
+		<span id='common-artists'>
+			<% var keys = Object.keys(artists); 
+			for (var i = 0; i<keys.length; i++) { %> 
+				<a target="_blank" href="https://open.spotify.com/artist/<%-keys[i]%>"><%- artists[keys[i]];%></a><% if (i < keys.length-1) {%>, <% }%> 
+			<% } %>
+		</span>
+		<br> <br>
+		<b> Tracks in Common: </b> 
+		<br>
+		<span id='common-tracks'>
+			<% var keys = Object.keys(tracks); 
+			for (var i = 0; i<keys.length; i++) { %> 
+			<a target="_blank" href="https://open.spotify.com/track//<%-keys[i]%>"><%- tracks[keys[i]].name;%></a><% if (i < keys.length-1) {%>, <% }%> 
+			<% } %>
+		</span>
+
+	</div>
+
+	<div class = "col-md-4 profile-container">
+		<img src="/img/hollow_circle.png" class="profile-pic other-profile-pic">
+		<h3 class="user-name other-user-name"></h3>
+		<div class="playlist-container">
+			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- otherDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
+		</div>
+	</div>
+
+</body>
+
+</html>
+
+
