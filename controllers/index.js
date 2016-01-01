@@ -15,7 +15,10 @@ var scopes = ['playlist-read-private', 'user-read-email'],
 	var spotifyApi = new SpotifyWebApi({
 	  redirectUri : redirectUri,
 	  clientId : clientId, 
-	  clientSecret: clientSecret
+	  clientSecret: clientSecret, 
+	  authorize_params: {
+        show_dialog: 'true'
+      }
 	});
 
 function userExists (token, callback) {
@@ -25,7 +28,7 @@ function userExists (token, callback) {
 	    MongoClient.connect(mongoUrl, function (err, db) {
 	    	db.collection('users').findOne({spotify_id: data.body.id}, function (err, result) {
 	    		db.close();
-	    		var toReturn = (!result) ? false : result._id.toString();
+	    		var toReturn = (!result) ? false : result.spotify_id;
 	    		callback(toReturn);
 	    	}); 
 	    });
@@ -54,6 +57,11 @@ function getIntersection (array1, array2) {
 	return inCommon;
 }
 
+router.get('/logout', function (req, res) { 
+	req.session.userId = false; 
+	res.redirect('/');
+}); 
+
 router.get('/', function (req, res) {
 	var loggedIn = (!req.session.userId) ? false: true;  
 	res.render('home', {loggedIn: loggedIn});
@@ -61,7 +69,7 @@ router.get('/', function (req, res) {
 
 router.get('/login', function (req, res) {
 	var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
-	res.redirect(authorizeURL);
+	res.redirect(authorizeURL + "&show_dialog=true");
 });
 
 router.get('/auth/spotify/callback', function (req, res){
@@ -89,8 +97,9 @@ router.get('/auth/spotify/callback', function (req, res){
 router.get('/add-user', function (req, res) {
 	if(!req.session.token) {
 		res.redirect('/login');
+	} else {
+		res.render('login', {token: req.session.token}); 
 	}
-	res.render('login', {token: req.session.token}); 
 }); 
 
 router.post('/add-user', function (req, res) {
@@ -103,26 +112,26 @@ router.post('/add-user', function (req, res) {
 			if (err) {
 				res.status(500).send('Database Error');
 			} else {
-				req.session.userId = result.ops[0]._id; 
-				res.status(201).send(result.ops[0]._id);
+				req.session.userId = result.ops[0].spotify_id; 
+				res.status(201).send(result.ops[0].spotify_id);
 			}
 		}); 
 	}); 
 });
 
-router.get('/compare/:uid', function (req, res) {
+router.get('/compare/:spotify_id', function (req, res) {
 	if (!req.session.userId) {
-		res.send('Must Be Logged In');
+		res.redirect('/'); 
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) { 
 			try {
-				db.collection('users').findOne({_id: new ObjectID(req.params.uid)}, function (err, user){
+				db.collection('users').findOne({spotify_id: req.params.spotify_id}, function (err, user){
 					if (err) {console.log(err);}
 					if (!user) {
 						db.close();
 						res.send('User Not Found');
 					}
-					db.collection('users').findOne({_id:new ObjectID(req.session.userId)}, function (err, user2){
+					db.collection('users').findOne({spotify_id:req.session.userId}, function (err, user2){
 						db.close();
 						var artistsInCommon = getIntersection(user.sorted_artists, user2.sorted_artists);
 						var tracksInCommon = getIntersection(user.sorted_tracks, user2.sorted_tracks);
@@ -143,7 +152,7 @@ router.get('/compare/:uid', function (req, res) {
 							currentDwId: user2.dw_spotify_id,
 							otherId: user.spotify_id, 
 							otherDwId: user.dw_spotify_id,
-							token: spotifyApi.getAccessToken()
+							token: spotifyApi.getAccessToken(),
 						});
 
 					});
@@ -159,13 +168,13 @@ router.get('/compare/:uid', function (req, res) {
 
 router.get('/discover', function (req, res) {
 	if (!req.session.userId) {
-		res.send('Must Be Logged In');
+		res.redirect('/');
 	} else {
 		MongoClient.connect(mongoUrl, function(err, db) {
 			assert.equal(null, err);
-			compareUsers(req.session.userId, db, function(uid) {
+			compareUsers(req.session.userId, db, function (spotify_id) {
 				db.close();
-				res.redirect(302, '/compare/'+uid);
+				res.redirect(302, '/compare/'+spotify_id);
 			});
 		});
 	}
@@ -176,7 +185,7 @@ var compareUsers = function(currentId, db, callback) {
 	var tracksMax = 0; 
 	var match = false; 
 	var collection = db.collection('users');
-	collection.findOne({_id: new ObjectID(currentId)}, function(err, currentUser) {
+	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
 		var cursor = collection.find({spotify_id: {"$ne": currentUser.spotify_id}});
 		cursor.each(function(err, user2) {
 		  if (user2 != null && currentUser.spotify_id != user2.spotify_id) {
@@ -186,7 +195,7 @@ var compareUsers = function(currentId, db, callback) {
 		    	if (tracksInCommon.length > tracksMax || (tracksInCommon.length == tracksMax && artistsInCommon.length > artistsMax)){
 			    	tracksMax = tracksInCommon.length; 
 			    	artistsMax = artistsInCommon.length;
-			    	match = user2._id;
+			    	match = user2.spotify_id;
 			    }
 		    } 
 		  } else {

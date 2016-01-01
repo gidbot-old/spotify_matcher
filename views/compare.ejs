@@ -25,17 +25,6 @@ $(function() {
 		$('.other-profile-pic').css('background-image', 'url(' + data.images[0].url + ')');
 	});
 
-	// spotifyApi.getPlaylistTracks('spotifydiscover', '<%- currentDwId %>').then(function (data) {
-	// 	var table = document.getElementById("current-playlist");
-	// 	for (var i =0; i < data.items.length; i++) {
-	// 		var row = table.insertRow(i+1);
-	// 		var cell1 = row.insertCell(0);
-	// 		var cell2 = row.insertCell(1);
-	// 		cell1.innerHTML = data.items[i].track.artists[0].name;
-	// 		cell2.innerHTML = data.items[i].track.name;
-	// 	}
-	// }); 
-
 	spotifyApi.getPlaylistTracks('spotifydiscover', '<%- otherDwId %>').then(function (data) {
 		console.log(data); 
 	}); 
@@ -53,13 +42,11 @@ $(function() {
 	body {
 		font-family: Menlo, 'Andale Mono', monospace;
 	}	
-	a { 
-		color: #1ed760
-	}
+
 	h2 {
 		text-align: center;
 		font-size: 36px;
-		margin-top: 75px;
+		margin-top: 50px;
 	}
 
 	h3 { 
@@ -91,6 +78,8 @@ $(function() {
 </style>
 
 <body>
+	<% include ./navbar.ejs %>
+
 	<h2> 
 		Discover Weekly Matcher
 	</h2> 
@@ -121,7 +110,7 @@ $(function() {
 		<span id='common-tracks'>
 			<% var keys = Object.keys(tracks); 
 			for (var i = 0; i<keys.length; i++) { %> 
-			<a target="_blank" href="https://open.spotify.com/track//<%-keys[i]%>"><%- tracks[keys[i]].name;%></a><% if (i < keys.length-1) {%>, <% }%> 
+			<a target="_blank" href="https://open.spotify.com/track/<%-keys[i]%>"><%- tracks[keys[i]].name;%></a><% if (i < keys.length-1) {%>, <% }%> 
 			<% } %>
 		</span>
 
