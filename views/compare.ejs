@@ -1,9 +1,8 @@
 <html>
-<head>
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
+<% include ./navbar.ejs %>
+
+<head>
 	<script type="text/javascript" src= "/js/spotify.js"></script>
 
 </head>
@@ -25,11 +24,6 @@ $(function() {
 		$('.other-profile-pic').css('background-image', 'url(' + data.images[0].url + ')');
 	});
 
-	spotifyApi.getPlaylistTracks('spotifydiscover', '<%- otherDwId %>').then(function (data) {
-		console.log(data); 
-	}); 
-
-	console.log($('.vs-container').height());
 	var vsHeight = 150 - $('.vs-container').height()/2; 
 	$('.vs-container').css('margin-top', vsHeight+"px");
 
@@ -78,7 +72,6 @@ $(function() {
 </style>
 
 <body>
-	<% include ./navbar.ejs %>
 
 	<h2> 
 		Discover Weekly Matcher
@@ -100,18 +93,24 @@ $(function() {
 		<br> 
 		<span id='common-artists'>
 			<% var keys = Object.keys(artists); 
+			if (keys.length < 1) { %> 
+				None
+			<% } else {
 			for (var i = 0; i<keys.length; i++) { %> 
 				<a target="_blank" href="https://open.spotify.com/artist/<%-keys[i]%>"><%- artists[keys[i]];%></a><% if (i < keys.length-1) {%>, <% }%> 
-			<% } %>
+			<% } } %>
 		</span>
 		<br> <br>
 		<b> Tracks in Common: </b> 
 		<br>
 		<span id='common-tracks'>
 			<% var keys = Object.keys(tracks); 
-			for (var i = 0; i<keys.length; i++) { %> 
+			if (keys.length < 1) { %> 
+				None
+			<% } else {
+				for (var i = 0; i<keys.length; i++) { %> 
 			<a target="_blank" href="https://open.spotify.com/track/<%-keys[i]%>"><%- tracks[keys[i]].name;%></a><% if (i < keys.length-1) {%>, <% }%> 
-			<% } %>
+			<% } } %>
 		</span>
 
 	</div>

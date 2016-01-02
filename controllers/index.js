@@ -103,20 +103,24 @@ router.get('/add-user', function (req, res) {
 }); 
 
 router.post('/add-user', function (req, res) {
-	MongoClient.connect(mongoUrl, function (err, db) {
-		if (err) { 
-			res.status(500).send('Database Error');
-		}
-		db.collection('users').insertOne(req.body, function (err, result) {
-			db.close();
-			if (err) {
+	if(!req.session.token) {
+		res.redirect('/login');
+	} else {
+		MongoClient.connect(mongoUrl, function (err, db) {
+			if (err) { 
 				res.status(500).send('Database Error');
-			} else {
-				req.session.userId = result.ops[0].spotify_id; 
-				res.status(201).send(result.ops[0].spotify_id);
 			}
+			db.collection('users').insertOne(req.body, function (err, result) {
+				db.close();
+				if (err) {
+					res.status(500).send('Database Error');
+				} else {
+					req.session.userId = result.ops[0].spotify_id; 
+					res.status(201).send(result.ops[0].spotify_id);
+				}
+			}); 
 		}); 
-	}); 
+	}
 });
 
 router.get('/compare/:spotify_id', function (req, res) {
@@ -170,7 +174,7 @@ router.get('/discover', function (req, res) {
 	if (!req.session.userId) {
 		res.redirect('/');
 	} else {
-		MongoClient.connect(mongoUrl, function(err, db) {
+		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
 			compareUsers(req.session.userId, db, function (spotify_id) {
 				db.close();
@@ -179,6 +183,53 @@ router.get('/discover', function (req, res) {
 		});
 	}
 }); 
+
+router.get('/random', function (req, res) { 
+	if (!req.session.userId) { 
+		res.redirect('/');
+	} else {
+		MongoClient.connect(mongoUrl, function (err, db) {
+			assert.equal(null, err);
+			db.collection('users').aggregate(
+				[
+					{ $match: {spotify_id: {$ne: req.session.userId}}},
+					{ $sample: { size: 1 }}
+				], function (err, randomUser){
+					db.close();
+					res.redirect(302, '/compare/'+randomUser[0].spotify_id);
+			});
+		}); 
+	}
+}); 
+
+function getSearch (req, res) {
+	if (!req.session.userId) { 
+		res.redirect('/');
+	} else {
+		res.send(req.users);
+	}
+}
+router.get('/search', getSearch); 
+
+router.post('/search', function (req, res) {
+	if (!req.session.userId) { 
+		res.redirect('/');
+	} else {
+		MongoClient.connect(mongoUrl, function (err, db) {
+			db.collection('users').find({display_name: {$regex:req.body.search,  $options: 'i'}},{spotify_id:1, display_name:1},{limit: 10}).toArray(function (err, users){
+				db.close();
+				req.users = users; 
+				getSearch(req, res);
+			});
+		});
+	}
+}); 
+
+
+
+router.get('/about', function (req, res) {
+	res.render('about');
+});
 
 var compareUsers = function(currentId, db, callback) {
 	var artistsMax = 0;

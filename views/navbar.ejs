@@ -1,4 +1,9 @@
 <html>
+<head>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
 
 	<style type="text/css">
 	    .navbar {
@@ -28,6 +33,13 @@
 		.navbar-left {
 			font-size: 16px;
 		}
+		.search-box {
+			height: 30px;
+    		margin-top: 2px;
+		}
+		.form-control:focus {
+			border-color: #1ed760;
+		}
 	</style>
 
 	<nav class="navbar navbar-default">
@@ -42,15 +54,13 @@
 	    <ul class="nav navbar-nav navbar-left">
 	    	<li> <a class='home' href="/logout"> Logout </a></li>
 	    	<li> <a class='home' href="/discover"> Discover </a></li>
+	    	<li> <a class='home' href="/random"> Random </a></li>
 	    	<li> <a class='about' href="/about"> About </a></li>
 	    </ul>
 
-	    <div class="collapse navbar-collapse" id="myNavbar">
-	      <ul class="nav navbar-nav navbar-right">
-	      	<li> <a class='search glyphicon glyphicon-search' href="/search"> </a></li>
-	      </ul>
-	    </div>
-
+	    <form action='/search' method='post' class="navbar-form navbar-right">
+	        <input name='search' type="text" id="search-text" class="form-control search-box" placeholder="Find User">
+		</form>
 	     
 
 	  </div>
