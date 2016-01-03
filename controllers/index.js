@@ -8,7 +8,7 @@ var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 
 var scopes = ['playlist-read-private', 'user-read-email'],
-    redirectUri = 'http://localhost:3000/auth/spotify/callback',
+    redirectUri = config.spotify_redirect,
     clientId = 'a9b262c869aa4a9391f78deb6bc5af3d',
     clientSecret = '449989ef56f041ce98079391c1952bd2',
     state = 'login';
