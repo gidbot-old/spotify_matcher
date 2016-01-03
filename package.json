@@ -4,7 +4,9 @@
   "description": "matcher",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "preinstall": "npm i -g pm2 && pm2 install pm2-logrotate"
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,19 @@
   "bugs": {
     "url": "https://github.com/gidbot/spotify_harmony/issues"
   },
-  "homepage": "https://github.com/gidbot/spotify_harmony"
+  "homepage": "https://github.com/gidbot/spotify_harmony",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "connect-redis": "^3.0.1",
+    "cookie-parser": "^1.4.0",
+    "ejs": "^2.3.4",
+    "express": "^4.12.3",
+    "express-session": "^1.11.3",
+    "mongodb": "^2.0.44",
+    "multer": "^1.0.5",
+    "pm2": "^0.15.7",
+    "redis": "^2.2.3",
+    "serve-favicon": "^2.3.0",
+    "stripe": "^4.0.0"
+  },
 }
