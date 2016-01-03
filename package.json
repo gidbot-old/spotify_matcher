@@ -4,9 +4,7 @@
   "description": "matcher",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "preinstall": "npm i -g pm2 && pm2 install pm2-logrotate"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
