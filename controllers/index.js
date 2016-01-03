@@ -134,7 +134,7 @@ router.get('/compare/:spotify_id', function (req, res) {
 					if (err) {console.log(err);}
 					if (!user) {
 						db.close();
-						res.send('User Not Found');
+						res.redirect('/not_found');
 					}
 					db.collection('users').findOne({spotify_id:req.session.userId}, function (err, user2){
 						db.close();
@@ -165,7 +165,7 @@ router.get('/compare/:spotify_id', function (req, res) {
 				});
 			} catch (e){
 				db.close();
-				res.send('User Not Found');
+				res.redirect('/not_found');
 			}
 		});
 	}
