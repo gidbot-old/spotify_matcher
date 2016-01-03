@@ -1,0 +1,22 @@
+{
+  "name": "discover-weekly",
+  "version": "1.0.0",
+  "description": "matcher",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gidbot/spotify_harmony.git"
+  },
+  "keywords": [
+    "base"
+  ],
+  "author": "gideon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gidbot/spotify_harmony/issues"
+  },
+  "homepage": "https://github.com/gidbot/spotify_harmony"
+}
