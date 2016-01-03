@@ -31,7 +31,7 @@ app.use(require('./controllers'))
 
 
 app.use(function(req, res, next) {
-  res.status(404).render('not_found');
+	res.redirect('/not_found');
 });
 
 app.listen(port, function() {

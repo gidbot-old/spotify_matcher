@@ -87,7 +87,9 @@ $(function() {
 		statusBar.style.width = "80%";
 		var user = {
 			spotify_id: id, 
-			details: userDetails, 
+			display_name: userDetails.display_name,
+			email: userDetails.email,
+			profile_pic: userDetails.profile_pic,
 			dw_spotify_id: dw_id,
 			tracks: tracks, 
 			artists: artists,

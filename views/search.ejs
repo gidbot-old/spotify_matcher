@@ -1,0 +1,63 @@
+<html>
+
+
+<% include ./navbar.ejs %>
+<% if (!users) {
+	users = [];
+}%>
+<head>
+	<script type="text/javascript" src= "/js/spotify.js"></script>
+</head>
+
+<style type="text/css">
+	body {
+		font-family: Menlo, 'Andale Mono', monospace;
+	}	
+
+	h2 {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 75px;
+	}
+	
+	h3 { 
+		text-align: center;
+		font-size: 24px;
+		margin-top: 20px;
+	} 
+
+	.profile-pic {
+		width: 150px; 
+		height: 150px;
+		background-size:100% auto;
+	}
+
+	.profile-container { 
+		text-align: center;
+		margin-top: 50px;
+	}
+</style>
+
+<body>
+
+	<% if (users.length < 1)  { %> 
+		<h2>
+			No Users Found
+		</h2>
+	<% } else { %> 
+		<h2> 
+			Users
+		</h2>
+		<%
+		for (var i = 0; i < users.length; i++) {
+		%> 
+		<a href='/compare/<%- users[i].spotify_id %>'>
+			<div class = "col-md-3 col-sm-4 profile-container">
+				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(<%- users[i].profile_pic %>)'>
+				<h3 class="user-name"><%- users[i].display_name%></h3>
+			</div>
+		</a>
+	<% } } %>
+
+</body>
+</html>

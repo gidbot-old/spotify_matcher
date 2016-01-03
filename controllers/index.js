@@ -152,11 +152,12 @@ router.get('/compare/:spotify_id', function (req, res) {
 							percent: percent,  
 							tracks: tracks, 
 							artists: artists, 
-							currentId: user2.spotify_id,
 							currentDwId: user2.dw_spotify_id,
-							otherId: user.spotify_id, 
 							otherDwId: user.dw_spotify_id,
-							token: spotifyApi.getAccessToken(),
+							currentDisplayName: user2.display_name,
+							otherDisplayName: user.display_name,
+							currentProfilePic: user2.profile_pic,
+							otherProfilePic: user.profile_pic 
 						});
 
 					});
@@ -202,11 +203,33 @@ router.get('/random', function (req, res) {
 	}
 }); 
 
+function searchUsers (search, page, callback) { 
+	page = parseInt(page);
+	if (!page || isNaN(page)) {
+		page = 0; 
+	}
+	MongoClient.connect(mongoUrl, function (err, db) {
+		db.collection('users').find(
+			{display_name: {$regex:search,  $options: 'i'}},
+			{spotify_id:1, display_name:1, profile_pic: 1},
+			{limit: 10, offset:page}).toArray(function (err, users){
+
+			db.close(); 
+			callback(users);
+
+		});
+	});
+}
+
 function getSearch (req, res) {
 	if (!req.session.userId) { 
 		res.redirect('/');
+	} else if (req.query.q) { 
+		searchUsers(req.query.q, req.query.page, function (users){
+			res.render('search', {users: req.users});
+		});
 	} else {
-		res.send(req.users);
+		res.render('search', {users: req.users});
 	}
 }
 router.get('/search', getSearch); 
@@ -215,17 +238,20 @@ router.post('/search', function (req, res) {
 	if (!req.session.userId) { 
 		res.redirect('/');
 	} else {
-		MongoClient.connect(mongoUrl, function (err, db) {
-			db.collection('users').find({display_name: {$regex:req.body.search,  $options: 'i'}},{spotify_id:1, display_name:1},{limit: 10}).toArray(function (err, users){
-				db.close();
-				req.users = users; 
-				getSearch(req, res);
-			});
+		searchUsers(req.body.search, req.query.page, function (users){
+			req.users = users; 
+			getSearch(req, res);
 		});
 	}
 }); 
 
-
+router.get('/not_found', function (req, res) {
+	if (!req.session.userId){
+		res.redirect('/');
+	} else {
+		res.status(404).render('not_found');
+	}
+}); 
 
 router.get('/about', function (req, res) {
 	res.render('about');
