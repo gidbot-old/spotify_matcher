@@ -111,6 +111,7 @@ router.post('/add-user', function (req, res) {
 			if (err) { 
 				res.status(500).send('Database Error');
 			}
+			req.body.random = Math.random();
 			db.collection('users').insertOne(req.body, function (err, result) {
 				db.close();
 				if (err) {
@@ -193,18 +194,24 @@ router.get('/random', function (req, res) {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
 			var random = Math.random();
-			db.collection('users').findOne({ 'random' :{ '$gte': random }}, {spotify_id:1}, function (err, user){
+
+			db.collection('users').find({ 'random' :{ '$gte': random }}, {spotify_id:1}, {sort:'random', limit:1}, function (err, users){
 				assert.equal(null, err);
-				if (user) {
-					db.close();
-					res.redirect(302, '/compare/'+user.spotify_id);
-				} else {
-					db.collection('users').findOne({ 'random' :{ '$lte': random }}, {spotify_id:1}, function (err, user){
-						assert.equal(null, err);
+				users.nextObject(function (err, user){
+					if (user) {
 						db.close();
 						res.redirect(302, '/compare/'+user.spotify_id);
-					});
-				}
+					} else {
+						console.log('test');
+						db.collection('users').find({ 'random' :{ '$lte': random }}, {spotify_id:1}, {sort: [['random','desc']], limit:1}, function (err, users){
+							users.nextObject(function (err, user){
+								db.close();
+								res.redirect(302, '/compare/'+user.spotify_id);
+							});
+						});
+					}
+
+				}); 	
 			});
 
 		}); 
@@ -269,7 +276,7 @@ var compareUsers = function(currentId, db, callback) {
 	var artistsMax = -1;
 	var tracksMax = -1; 
 	var match = false; 
-	var collection = db.collection('users');
+	var collection = db.collection('users');	
 	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
 		var cursor = collection.find({spotify_id: {"$ne": currentUser.spotify_id}});
 		cursor.each(function(err, user2) {

@@ -95,8 +95,7 @@ $(function() {
 			tracks: tracks, 
 			artists: artists,
 			sorted_tracks: Object.keys(tracks).sort(),
-			sorted_artists: Object.keys(artists).sort(),
-			random: Math.random()
+			sorted_artists: Object.keys(artists).sort()
 		}
 		$.post( "/add-user", user)
 		  .done(function (data) {
