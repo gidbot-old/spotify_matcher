@@ -148,7 +148,7 @@ router.get('/compare/:spotify_id', function (req, res) {
 						for (var i = 0; i < tracksInCommon.length; i++){
 							tracks[tracksInCommon[i]] = user2.tracks[tracksInCommon[i]];
 						}
-						var percent = ((tracksInCommon.length + artistsInCommon.length)/50*100).toFixed(2); 
+						var percent = ((tracksInCommon.length + artistsInCommon.length)/60*100).toFixed(2); 
 						res.render('compare', {
 							percent: percent,  
 							tracks: tracks, 
