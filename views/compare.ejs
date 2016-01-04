@@ -78,6 +78,9 @@ $(function() {
 		background-color: #169d46;
 		border-color: #107032;
 	}
+	.discover-text{
+		text-align: center;
+	}
 
 </style>
 
@@ -85,6 +88,7 @@ $(function() {
 	<h2> 
 		Discover Weekly Matcher
 	</h2> 
+
 	<div class='random'>
 		<a href='/random' class="btn btn-md btn-success" role="button"> Random </a>
 	</div>
@@ -92,6 +96,8 @@ $(function() {
 	<div class = "col-md-4 profile-container">
 		<img src="/img/hollow_circle.png" class="profile-pic current-profile-pic">
 		<h3 class="user-name current-user-name"></h3>
+		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%-currentDwId %>"> Discover Weekly </a>
+		
 		<div class="playlist-container">
 			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- currentDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
 		</div>
@@ -130,6 +136,8 @@ $(function() {
 	<div class = "col-md-4 profile-container">
 		<img src="/img/hollow_circle.png" class="profile-pic other-profile-pic">
 		<h3 class="user-name other-user-name"></h3>
+		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%- otherDwId %>"> Discover Weekly </a>
+
 		<div class="playlist-container">
 			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- otherDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
 		</div>
