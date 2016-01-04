@@ -192,14 +192,21 @@ router.get('/random', function (req, res) {
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
-			db.collection('users').aggregate(
-				[
-					{ $match: {spotify_id: {$ne: req.session.userId}}},
-					{ $sample: { size: 1 }}
-				], function (err, randomUser){
+			var random = Math.random();
+			db.collection('users').findOne({ 'random' :{ '$gte': random }}, {spotify_id:1}, function (err, user){
+				assert.equal(null, err);
+				if (user) {
 					db.close();
-					res.redirect(302, '/compare/'+randomUser[0].spotify_id);
+					res.redirect(302, '/compare/'+user.spotify_id);
+				} else {
+					db.collection('users').findOne({ 'random' :{ '$lte': random }}, {spotify_id:1}, function (err, user){
+						assert.equal(null, err);
+						db.close();
+						res.redirect(302, '/compare/'+user.spotify_id);
+					});
+				}
 			});
+
 		}); 
 	}
 }); 
