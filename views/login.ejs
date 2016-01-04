@@ -46,10 +46,11 @@ $(function() {
 
 	spotifyApi.getMe().then(function (data) {
 		id = data.id;
+		var img_url = (data.images.length > 0)? data.images[0].url: '/img/bill_withers.png'; 
 		userDetails = {
 			display_name: data.display_name,
 			email: data.email,
-			profile_pic: data.images[0].url
+			profile_pic: img_url
 		}
 		statusBar.style.width = "15%";
 		return id;
