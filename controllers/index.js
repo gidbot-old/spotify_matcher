@@ -266,8 +266,8 @@ router.get('/about', function (req, res) {
 });
 
 var compareUsers = function(currentId, db, callback) {
-	var artistsMax = 0;
-	var tracksMax = 0; 
+	var artistsMax = -1;
+	var tracksMax = -1; 
 	var match = false; 
 	var collection = db.collection('users');
 	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
