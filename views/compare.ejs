@@ -19,7 +19,7 @@ $(function() {
 
 
 	var vsHeight = 150 - $('.vs-container').height()/2;
-	vsHeight = (vsHeight < 0) ? 0: vsHeight;
+	vsHeight = (vsHeight < 10) ? 10: vsHeight;
 	$('.vs-container').css('margin-top', vsHeight+"px");
 
 
