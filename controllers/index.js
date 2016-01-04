@@ -91,7 +91,7 @@ router.get('/auth/spotify/callback', function (req, res){
 			}); 
 
 		}, function (err) {
-			res.send('Error Loggin In');
+			res.redirect('/');
 		});
 });
 
