@@ -155,8 +155,8 @@ router.get('/compare/:spotify_id', function (req, res) {
 							artists: artists, 
 							currentDwId: user2.dw_spotify_id,
 							otherDwId: user.dw_spotify_id,
-							currentDisplayName: user2.display_name,
-							otherDisplayName: user.display_name,
+							currentDisplayName: (user2.display_name)? user2.display_name: user2.spotify_id,
+							otherDisplayName: (user.display_name)? user.display_name: user.spotify_id,
 							currentProfilePic: user2.profile_pic,
 							otherProfilePic: user.profile_pic 
 						});

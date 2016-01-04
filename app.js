@@ -10,6 +10,15 @@ var express = require('express')
 
 // app.use(favicon(path.join(__dirname,'public','img','favicon2.ico')));
 
+app.use(function (req, res, next) {
+  var url = req.get('host');
+  if (req.headers['x-forwarded-proto'] == 'https') {
+    res.redirect('http://discover-weekly.herokuapp.com/');
+  } else {
+    next();
+  }
+});
+
 app.use(session({ 
 	secret: 'keyboard_cat', 
 	cookie: {
