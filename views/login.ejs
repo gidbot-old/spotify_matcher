@@ -1,16 +1,9 @@
 <html>
 <head>
-	
- <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-  <script type="text/javascript" src= "/js/spotify.js"></script>
-
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
-
-
 <style type="text/css">
 	body {
 		font-family: Menlo, 'Andale Mono', monospace;
@@ -27,101 +20,84 @@
 		margin-top: 25px;
 	}
 
+	.btn-success { 
+		background-color: #19b350;
+		border-color: #19b350;
+	}
+	.btn-success:hover{
+		background-color: #169d46;
+		border-color: #107032;
+	}
 </style>
 
+<body>
 
 <script>
+ 
 $(function() {
 
-	var spotifyApi = new SpotifyWebApi();
-	spotifyApi.setAccessToken('<%- token %>');
+	$('.facebook-btn').click(function (){
+		
+		FB.login(function(response) {
+			if (response.authResponse) {
+			     $.post( "/facebook-login", response)
+				 .done(function (data) {
+				 	if (data.spotify){
+				 		window.location.replace("/login");
+				 	} else {
+				 		window.location.replace("/auth/spotify");
+				 	}
+				 })
+				 .fail(function (data){
+					console.log('Failure')
+				 });
+		    } else {
+		     	alert('Please Authorize the Discover-Weekly');
+		    }
 
-	var userDetails;
-	var id; 
-	var dw_id; 
-	var tracks = {};
-	var artists = {}; 
-	var statusBar = document.getElementById("progress-bar"); 
-	statusBar.style.width = "5%"; 
+		}, {scope: 'user_friends'});
 
-	spotifyApi.getMe().then(function (data) {
-		id = data.id;
-		var img_url = (data.images.length > 0)? data.images[0].url: '/img/bill_withers.png'; 
-		userDetails = {
-			display_name: data.display_name,
-			email: data.email,
-			profile_pic: img_url
-		}
-		statusBar.style.width = "15%";
-		return id;
-	})
-	.then(function (user_id) {
-		statusBar.style.width = "25%";
-		return spotifyApi.getUserPlaylists(user_id, {limit:50});
-	})
-	.then(function (data) {
-		statusBar.style.width = "40%";
-		var items = data.items; 
-	    for (var i = 0; i < items.length; i++) {
-	    	if (items[i].owner.id == 'spotifydiscover') { 
-	    		dw_id = items[i].id; 
-	    		return items[i].id; 
-	    	}
-	    }
-	})
-	.then(function (playlist_id) {
-		statusBar.style.width = "60%";
-		return spotifyApi.getPlaylistTracks('spotifydiscover', playlist_id);
-	})
-	.then(function (data) {
-		statusBar.style.width = "70%";
-		for (var i = 0; i < data.items.length; i++) {
-			var item = data.items[i];
-			tracks[item.track.id] = { 
-				name: item.track.name, 
-				artist: item.track.artists[0].name
-			}
-			artists[item.track.artists[0].id] = item.track.artists[0].name;  
-		}
-	})
-	.then(function () {
-		statusBar.style.width = "80%";
-		var user = {
-			spotify_id: id, 
-			display_name: userDetails.display_name,
-			email: userDetails.email,
-			profile_pic: userDetails.profile_pic,
-			dw_spotify_id: dw_id,
-			tracks: tracks, 
-			artists: artists,
-			sorted_tracks: Object.keys(tracks).sort(),
-			sorted_artists: Object.keys(artists).sort()
-		}
-		$.post( "/add-user", user)
-		  .done(function (data) {
-		    statusBar.style.width = "100%";
-			window.location.replace("/");
-		}).fail(function (data){
-			console.log('Failure')
-		}) ;
-	})
-	.catch(function(error) {
-		console.error(error);
 	});
+	
+
+window.fbAsyncInit = function() {
+	FB.init({
+		appId      : '1504441939859902',
+		xfbml      : true,
+		version    : 'v2.5'
+	});
+};
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
 });
+
+  
+
 </script>
 
-<body>
 	<h2> 
 		Discover Weekly Matcher
 	</h2>
 
-	<div class="container">
-  	<h4> Adding Spotify Discover Weekly Playlist </h4>
-  	<div class="progress">
-    	<div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-    </div>
-  </div>
-</div>
+	<div class = "col-lg-12 buttons">
+		<% if (!facebook || !spotify) { %>
+			<% if (!facebook) { %>
+				<a href='#' class="facebook-btn btn btn-lg btn-info" role="button"> Log in to Facebook </a>
+			<% } else { %>
+				<a href='/auth/spotify' class="btn btn-lg btn-success" role="button"> Log in to Spotify </a>
+			<% } %> 
+		<% } else { %>
+			<a href='/discover' class="btn btn-lg btn-success" role="button"> Discover </a>
+		<% } %> 
+	</div>
+
 </body>
+
 </html>

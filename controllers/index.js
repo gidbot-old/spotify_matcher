@@ -6,6 +6,10 @@ var config = require('../config');
 var mongoUrl = config.mongo_url;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
+var FB = require('fb');	
+
+var facebook = 'facebook';
+var spotify = 'spotify';
 
 var scopes = ['playlist-read-private', 'user-read-email'],
     redirectUri = config.spotify_redirect,
@@ -22,20 +26,46 @@ var scopes = ['playlist-read-private', 'user-read-email'],
       }
 	});
 
-function userExists (token, callback) {
+function previousSpotify (token, callback) {
 	spotifyApi.setAccessToken(token); 
 	spotifyApi.getMe()
 	  .then(function(data) {
 	    MongoClient.connect(mongoUrl, function (err, db) {
 	    	db.collection('users').findOne({spotify_id: data.body.id}, function (err, result) {
 	    		db.close();
-	    		var toReturn = (!result) ? false : result.spotify_id;
+	    		var toReturn = (!result) ? false : result;
 	    		callback(toReturn);
 	    	}); 
 	    });
 	  }, function(err) {
 	  		callback(false);
 	  });
+}
+
+
+function idExists (fb_id, service, callback) {
+	MongoClient.connect(mongoUrl, function (err, db) {
+    	db.collection('users').findOne({facebook_id: fb_id}, function (err, result) {
+    		if (service == facebook) {
+				var toReturn = (!result) ? false : result;
+
+				if (toReturn) {
+					db.close();
+					callback(result); 
+				} else {
+					db.collection('fb_users').findOne({facebook_id: fb_id}, function (err, result) {
+						db.close();
+						var toReturn = (!result) ? false : result;
+						callback(result); 
+					});
+				}
+    		} else {
+    			db.close();
+    			var toReturn = (!result)? false : result;
+    			callback(result); 
+    		}
+    	}); 
+    });
 }
 
 function getIntersection (array1, array2) {
@@ -58,86 +88,159 @@ function getIntersection (array1, array2) {
 	return inCommon;
 }
 
+router.get('/', function (req, res){
+	res.redirect('login');
+}); 
+
 router.get('/logout', function (req, res) { 
-	req.session.userId = false; 
-	res.redirect('/');
+	req.session = false; 
+	res.redirect('/login');
 }); 
 
-router.get('/', function (req, res) {
-	var loggedIn = (!req.session.userId) ? false: true;  
-	res.render('home', {loggedIn: loggedIn});
+router.get('/login', function (req, res) {  
+	res.render('login', {
+		facebook: (!req.session.facebookId) ? false: true, 
+		spotify: (!req.session.spotifyId) ? false: true
+	});
 }); 
 
-router.get('/login', function (req, res) {
-	var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
-	res.redirect(authorizeURL + "&show_dialog=true");
+router.get('/auth/spotify', function (req, res) {
+	if (!req.session.facebookId) {
+		res.redirect('/login');
+	} else {
+		var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+		res.redirect(authorizeURL + "&show_dialog=true");
+	}
+	
 });
 
 router.get('/auth/spotify/callback', function (req, res){
-	var code = req.query.code; 
-	spotifyApi.authorizationCodeGrant(code)
+	if (!req.session.facebookId || (req.session.facebookId && req.session.spotifyId)) {
+		res.direct('/');
+	}  else  {
+		var code = req.query.code; 
+		spotifyApi.authorizationCodeGrant(code)
 		.then(function(data) {
-			req.session.token = data.body['access_token'];
+			req.session.spotifyToken = data.body['access_token'];
 			spotifyApi.setAccessToken(data.body['access_token']);
     		spotifyApi.setRefreshToken(data.body['refresh_token']);
 			
-			userExists(data.body['access_token'], function (id) {
-				if (!id) {
-					res.redirect(302, '/add-user'); 
+			previousSpotify(data.body['access_token'], function (result) {
+				if (!result) {
+					res.redirect(302, '/spotify-login'); 
 				} else {
-					req.session.userId = id; 
-					res.redirect(302, '/');
+					MongoClient.connect(mongoUrl, function (err, db) {
+						db.collection('fb_users').deleteOne({facebook_id: req.session.facebookId}, function (err){
+							db.collection('users').update({spotify_id: result.spotify_id}, {$set:{facebook_id:req.session.facebookId}}, function (err, response) {
+								db.close();
+								req.session.spotifyId = result.spotify_id; 
+								res.redirect(302, '/login'); 
+							});
+						}); 
+					});
 				}
 			}); 
 
 		}, function (err) {
-			res.redirect('/');
+			res.redirect('/login');
 		});
+	}
+
 });
 
-router.get('/add-user', function (req, res) {
-	if(!req.session.token) {
+router.post('/facebook-login', function (req, res) {
+	if (!req.body.authResponse) {
+		res.status(401).send({login: 'rejected'});
+	} else {
+		req.session.facebookToken = req.body.authResponse.accessToken;
+		FB.setAccessToken(req.body.authResponse.accessToken);
+
+		idExists(req.body.authResponse.userID, facebook, function (doc){
+			if (!doc){
+				MongoClient.connect(mongoUrl, function (err, db) {
+					if (err) { 
+						res.status(500).send('Database Error');
+					}
+					db.collection('fb_users').insertOne({facebook_id: req.body.authResponse.userID}, function (err, result) {
+						db.close();
+						if (err) {
+							res.status(500).send('Database Error');
+						} else {
+							req.session.facebookId = result.ops[0].facebook_id; 
+							idExists(result.ops[0].facebook_id, spotify, function (result) {
+								if (result) {
+									req.session.spotifyId = result.spotifyId; 
+									res.status(200).send({spotify:true});
+								} else {
+									res.status(200).send({spotify:false});
+								}
+							});
+						}
+					}); 
+				}); 
+			} else {
+				req.session.facebookId = req.body.authResponse.userID; 
+				if (doc.spotify_id) {
+					req.session.spotifyId = doc.spotify_id; 
+					res.status(200).send({facebook:true, spotify:true});
+				} else{ 
+					res.status(200).send({facebook:true, spotify:false});
+				}
+			}
+		}); 
+
+	}
+});
+
+router.get('/spotify-login', function (req, res) {
+	if(!req.session.spotifyToken) {
 		res.redirect('/login');
 	} else {
-		res.render('login', {token: req.session.token}); 
+		res.render('spotify-login', {token: req.session.spotifyToken}); 
 	}
 }); 
 
-router.post('/add-user', function (req, res) {
-	if(!req.session.token) {
-		res.redirect('/login');
+router.post('/spotify-login', function (req, res) {
+	if (!req.session.facebookId){
+		res.status(401).send('Log in to Facebook First');
+	} else if(!req.session.spotifyToken) {
+		res.status(401).send('Log in to Spotify First');
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			if (err) { 
 				res.status(500).send('Database Error');
 			}
-			req.body.random = Math.random();
+
+			req.body["facebook_id"] = req.session.facebookId;
 			db.collection('users').insertOne(req.body, function (err, result) {
-				db.close();
 				if (err) {
+					db.close();
 					res.status(500).send('Database Error');
 				} else {
-					req.session.userId = result.ops[0].spotify_id; 
-					res.status(201).send(result.ops[0].spotify_id);
+					db.collection('fb_users').deleteOne({facebook_id: req.session.facebookId}, function(){
+						db.close();
+					}); 
+					req.session.spotifyId = req.body.spotify_id; 
+					res.status(200).send('User Added');
 				}
 			}); 
 		}); 
 	}
 });
 
-router.get('/compare/:spotify_id', function (req, res) {
-	if (!req.session.userId) {
-		res.redirect('/'); 
+router.get('/compare/:facebook_id', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login'); 
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) { 
 			try {
-				db.collection('users').findOne({spotify_id: req.params.spotify_id}, function (err, user){
+				db.collection('users').findOne({facebook_id: req.params.facebook_id}, function (err, user){
 					if (err) {console.log(err);}
 					if (!user) {
 						db.close();
 						res.redirect('/not_found');
 					}
-					db.collection('users').findOne({spotify_id:req.session.userId}, function (err, user2){
+					db.collection('users').findOne({facebook_id: req.session.facebookId}, function (err, user2){
 						db.close();
 						var artistsInCommon = getIntersection(user.sorted_artists, user2.sorted_artists);
 						var tracksInCommon = getIntersection(user.sorted_tracks, user2.sorted_tracks);
@@ -174,47 +277,32 @@ router.get('/compare/:spotify_id', function (req, res) {
 }); 
 
 router.get('/discover', function (req, res) {
-	if (!req.session.userId) {
-		res.redirect('/');
+	if (!req.session.facebookId && !req.session.spotifyId) {
+		res.redirect('/login');
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
-			compareUsers(req.session.userId, db, function (spotify_id) {
+			discoverUsers(req.session.spotifyId, db, function (facebook_id) {
 				db.close();
-				res.redirect(302, '/compare/'+spotify_id);
+				res.redirect(302, '/compare/'+ facebook_id);
 			});
 		});
 	}
 }); 
 
 router.get('/random', function (req, res) { 
-	if (!req.session.userId) { 
-		res.redirect('/');
+	if (!req.session.facebookId && !req.session.spotifyId) {
+		res.redirect('/login');
 	} else {
-		MongoClient.connect(mongoUrl, function (err, db) {
-			assert.equal(null, err);
-			var random = Math.random();
+		FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
+		  if(!fb_response || fb_response.error) {
+		    res.status(500).send('Facebook Error');
+		  } else {
+		  	var index = Math.floor((Math.random() * (fb_response.data.length-1)));
+		  	res.redirect(302, '/compare/'+ fb_response.data[index].id);
+		  }
 
-			db.collection('users').find({ 'random' :{ '$gte': random }}, {spotify_id:1}, {sort:'random', limit:1}, function (err, users){
-				assert.equal(null, err);
-				users.nextObject(function (err, user){
-					if (user) {
-						db.close();
-						res.redirect(302, '/compare/'+user.spotify_id);
-					} else {
-						console.log('test');
-						db.collection('users').find({ 'random' :{ '$lte': random }}, {spotify_id:1}, {sort: [['random','desc']], limit:1}, function (err, users){
-							users.nextObject(function (err, user){
-								db.close();
-								res.redirect(302, '/compare/'+user.spotify_id);
-							});
-						});
-					}
-
-				}); 	
-			});
-
-		}); 
+		});
 	}
 }); 
 
@@ -237,8 +325,8 @@ function searchUsers (search, page, callback) {
 }
 
 function getSearch (req, res) {
-	if (!req.session.userId) { 
-		res.redirect('/');
+	if (!req.session.facebookId) { 
+		res.redirect('/login');
 	} else if (req.query.q) { 
 		searchUsers(req.query.q, req.query.page, function (users){
 			res.render('search', {users: req.users});
@@ -250,8 +338,8 @@ function getSearch (req, res) {
 router.get('/search', getSearch); 
 
 router.post('/search', function (req, res) {
-	if (!req.session.userId) { 
-		res.redirect('/');
+	if (!req.session.facebookId) { 
+		res.redirect('/login');
 	} else {
 		searchUsers(req.body.search, req.query.page, function (users){
 			req.users = users; 
@@ -261,8 +349,8 @@ router.post('/search', function (req, res) {
 }); 
 
 router.get('/not_found', function (req, res) {
-	if (!req.session.userId){
-		res.redirect('/');
+	if (!req.session.facebookId){
+		res.redirect('/login');
 	} else {
 		res.status(404).render('not_found');
 	}
@@ -272,13 +360,13 @@ router.get('/about', function (req, res) {
 	res.render('about');
 });
 
-var compareUsers = function(currentId, db, callback) {
+var discoverUsers = function(currentId, db, callback) {
 	var artistsMax = -1;
 	var tracksMax = -1; 
 	var match = false; 
 	var collection = db.collection('users');	
 	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
-		var cursor = collection.find({spotify_id: {"$ne": currentUser.spotify_id}});
+		var cursor = collection.find({tracks:{'$exists':true}, spotify_id: {"$ne": currentUser.spotify_id}});
 		cursor.each(function(err, user2) {
 		  if (user2 != null && currentUser.spotify_id != user2.spotify_id) {
 		    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
@@ -287,7 +375,7 @@ var compareUsers = function(currentId, db, callback) {
 		    	if (tracksInCommon.length > tracksMax || (tracksInCommon.length == tracksMax && artistsInCommon.length > artistsMax)){
 			    	tracksMax = tracksInCommon.length; 
 			    	artistsMax = artistsInCommon.length;
-			    	match = user2.spotify_id;
+			    	match = user2.facebook_id;
 			    }
 		    } 
 		  } else {

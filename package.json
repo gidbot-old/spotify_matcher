@@ -26,12 +26,13 @@
     "ejs": "^2.3.4",
     "express": "^4.12.3",
     "express-session": "^1.11.3",
+    "fb": "^0.7.3",
     "mongodb": "^2.0.44",
     "multer": "^1.0.5",
     "pm2": "^0.15.7",
     "redis": "^2.2.3",
     "serve-favicon": "^2.3.0",
-    "stripe": "^4.0.0", 
-    "spotify-web-api-node": "^2.2.0"
+    "spotify-web-api-node": "^2.2.0",
+    "stripe": "^4.0.0"
   }
 }
