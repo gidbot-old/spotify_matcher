@@ -11,11 +11,9 @@ $(function() {
 
 
 	$('.current-user-name').text('<%- currentDisplayName %>');
-	$('.current-profile-pic').css('background-image', 'url(<%- currentProfilePic %>)');
 
 
 	$('.other-user-name').text('<%- otherDisplayName %>');
-	$('.other-profile-pic').css('background-image', 'url(<%- otherProfilePic %>)');
 
 
 	var vsHeight = 150 - $('.vs-container').height()/2;
@@ -94,8 +92,11 @@ $(function() {
 	</div>
 
 	<div class = "col-md-4 profile-container">
-		<img src="/img/hollow_circle.png" class="profile-pic current-profile-pic">
-		<h3 class="user-name current-user-name"></h3>
+		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- currentFacebookId %>/picture?type=large)'>
+
+		<h3 class="user-name">
+			<%- currentDisplayName %>
+		</h3>
 		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%-currentDwId %>"> Discover Weekly Playlist </a>
 		
 		<div class="playlist-container">
@@ -134,8 +135,10 @@ $(function() {
 	</div>
 
 	<div class = "col-md-4 profile-container">
-		<img src="/img/hollow_circle.png" class="profile-pic other-profile-pic">
-		<h3 class="user-name other-user-name"></h3>
+	<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- otherFacebookId %>/picture?type=large)'>
+		<h3 class="user-name">
+			<%-  otherDisplayName %>
+		</h3>
 		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%- otherDwId %>"> Discover Weekly Playlist </a>
 
 		<div class="playlist-container">

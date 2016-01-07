@@ -51,9 +51,9 @@
 		<%
 		for (var i = 0; i < users.length; i++) {
 		%> 
-		<a href='/compare/<%- users[i].spotify_id %>'>
+		<a href='/compare/<%- users[i].facebook_id %>'>
 			<div class = "col-md-3 col-sm-4 profile-container">
-				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(<%- users[i].profile_pic %>)'>
+				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- users[i].facebook_id %>/picture?type=large)'>
 				<h3 class="user-name"><%- users[i].display_name%></h3>
 			</div>
 		</a>
