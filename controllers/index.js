@@ -379,7 +379,7 @@ var discoverUsers = function(currentId, db, callback) {
 	var match = false; 
 	var collection = db.collection('users');	
 	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
-		var cursor = collection.find({tracks:{'$exists':true}, spotify_id: {"$ne": currentUser.spotify_id}});
+		var cursor = collection.find({tracks:{'$exists':true}, facebook_id:{'$exists':true}, spotify_id: {"$ne": currentUser.spotify_id}});
 		cursor.each(function(err, user2) {
 		  if (user2 != null && currentUser.spotify_id != user2.spotify_id) {
 		    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
