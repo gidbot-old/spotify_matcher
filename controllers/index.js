@@ -298,8 +298,12 @@ router.get('/random', function (req, res) {
 		  if(!fb_response || fb_response.error) {
 		    res.status(500).send('Facebook Error');
 		  } else {
-		  	var index = Math.floor((Math.random() * (fb_response.data.length-1)));
-		  	res.redirect(302, '/compare/'+ fb_response.data[index].id);
+		  	if (!fb_response.data) {
+		  		res.render('add_friends');
+		  	} else { 
+		  		var index = Math.floor((Math.random() * (fb_response.data.length-1)));
+		  		res.redirect(302, '/compare/'+ fb_response.data[index].id);
+		  	}
 		  }
 		});
 	}
