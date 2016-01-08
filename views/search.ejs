@@ -46,15 +46,16 @@
 		</h2>
 	<% } else { %> 
 		<h2> 
-			Users
+			<%- title %>
 		</h2>
 		<%
 		for (var i = 0; i < users.length; i++) {
+			var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
 		%> 
-		<a href='/compare/<%- users[i].facebook_id %>'>
+		<a href='/compare/<%- id %>'>
 			<div class = "col-md-3 col-sm-4 profile-container">
-				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- users[i].facebook_id %>/picture?type=large)'>
-				<h3 class="user-name"><%- users[i].display_name%></h3>
+				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large)'>
+				<h3 class="user-name"><%- users[i].name%></h3>
 			</div>
 		</a>
 	<% } } %>

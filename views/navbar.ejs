@@ -45,7 +45,7 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 		a:visited {
 			color: #19b350;
 		}
-		.search {
+		.navbar-right {
 			font-size: 16px;
 		}
 		.navbar-left {
@@ -53,7 +53,7 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 		}
 		.search-box {
 			height: 30px;
-    		margin-top: 2px;
+    		margin-top: 10px;
 		}
 		.form-control:focus {
 			border-color: #1ed760;
@@ -62,6 +62,19 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 		  float: left;
 		  margin-left: 10px;
 		}
+
+		/* mobile navbar */
+		@media (max-width: 767px) {
+			.navbar-collapse {
+				border-top: none !important;
+				border-bottom: 1px solid transparent; 
+			}
+			.search-box {
+				width: 50%;
+    			margin-left: 10px;
+			}
+		}
+
 	</style>
 
 	<nav class="navbar navbar-default">
@@ -75,15 +88,20 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 	    </div>
 
 	   	<div class="collapse navbar-collapse" id="myNavbar">
-	   		<ul class="nav navbar-nav navbar-left" id="myNabar">
-		    	<li> <a class='home' href="/logout"> Logout </a></li>
-		    	<li> <a class='home' href="/discover"> Top Match </a></li>
-		    	<li> <a class='about' href="/about"> About </a></li>
+	   		<ul class="nav navbar-nav navbar-left">
+		    	<li> <a href="/logout"> Logout </a></li>
+		    	<li> <a href="/discover"> Top Match </a></li>
+		    	<li> <a href="/about"> About </a></li>
 	    	</ul>
 		
-	    	<form action='/search' method='post' class="navbar-form navbar-right">
-		        <input name='search' type="text" id="search-text" class="form-control search-box" placeholder="Search By Name">
-			</form>
+			<ul class="nav navbar-nav navbar-right">
+				<li> <a href="/friends"> Friends </a></li>
+				<li>
+				<form action='/search' method='post'>
+		        	<input name='search' type="text" id="search-text" class="form-control search-box" placeholder="Find User">
+				</form>
+				</li>
+			</ul>
 		</div> 
 
 	  </div>

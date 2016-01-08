@@ -48,7 +48,7 @@ $(function() {
 		id = data.id;
 		var img_url = (data.images.length > 0)? data.images[0].url: '/img/bill_withers.png'; 
 		userDetails = {
-			display_name: data.display_name,
+			name: data.display_name,
 			email: data.email,
 			profile_pic: img_url
 		}
@@ -88,7 +88,7 @@ $(function() {
 		statusBar.style.width = "80%";
 		var user = {
 			spotify_id: id, 
-			display_name: userDetails.display_name,
+			name: userDetails.name,
 			email: userDetails.email,
 			profile_pic: userDetails.profile_pic,
 			dw_spotify_id: dw_id,

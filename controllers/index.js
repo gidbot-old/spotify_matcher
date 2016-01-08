@@ -259,8 +259,8 @@ router.get('/compare/:facebook_id', function (req, res) {
 							artists: artists, 
 							currentDwId: user2.dw_spotify_id,
 							otherDwId: user.dw_spotify_id,
-							currentDisplayName: (user2.display_name)? user2.display_name: user2.spotify_id,
-							otherDisplayName: (user.display_name)? user.display_name: user.spotify_id,
+							currentDisplayName: (user2.name)? user2.name: user2.spotify_id,
+							otherDisplayName: (user.name)? user.name: user.spotify_id,
 							currentFacebookId: user2.facebook_id,
 							otherFacebookId: user.facebook_id
 						});
@@ -305,16 +305,15 @@ router.get('/random', function (req, res) {
 	}
 }); 
 
-router.get('friends', function (req, res) {
+router.get('/friends', function (req, res) {
 	if (!req.session.facebookId && !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
+		FB.api('me/friends', 'get', {limit: 30},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
 		    res.status(500).send('Facebook Error');
 		  } else {
-		  	var index = Math.floor((Math.random() * (fb_response.data.length-1)));
-		  	res.redirect(302, '/compare/'+ fb_response.data[index].id);
+		  	res.render('search', {title: 'Friends', users: fb_response.data});
 		  }
 		});
 	}
@@ -327,8 +326,8 @@ function searchUsers (search, page, callback) {
 	}
 	MongoClient.connect(mongoUrl, function (err, db) {
 		db.collection('users').find(
-			{display_name: {$regex:search,  $options: 'i'}},
-			{facebook_id:1, display_name:1},
+			{name: {$regex:search,  $options: 'i'}},
+			{facebook_id:1, name:1},
 			{limit: 10, offset:page}).toArray(function (err, users){
 
 			db.close(); 
@@ -346,7 +345,7 @@ function getSearch (req, res) {
 			res.render('search', {users: req.users});
 		});
 	} else {
-		res.render('search', {users: req.users});
+		res.render('search', {title: 'Users', users: req.users});
 	}
 }
 router.get('/search', getSearch); 
