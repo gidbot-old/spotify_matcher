@@ -1,10 +1,15 @@
 <html>
+	<title> Login </title>
 <head>
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
 <style type="text/css">
+	.btn-info:focus {
+		background-color: #324b81 !important;
+		border-color: #324b81 !important;
+	}
 	body {
 		font-family: Menlo, 'Andale Mono', monospace;
 	}	
@@ -17,7 +22,10 @@
 
 	.buttons {
 		text-align: center; 
-		margin-top: 25px;
+	}
+
+	.explanation {
+		font-size: 16px;
 	}
 
 	.btn-success { 
@@ -36,6 +44,8 @@
 		background-color: #324b81;
 		border-color: #324b81;
 	}
+	
+
 </style>
 
 <body>
@@ -89,11 +99,20 @@ window.fbAsyncInit = function() {
 
 </script>
 
-	<h2> 
-		Discover Weekly Matcher
-	</h2>
+	<div class='col-xs-8 col-xs-offset-2' style="text-align: center; margin-top: 50px;">
 
-	<div class = "col-lg-12 buttons">
+		<h1>
+			<b> Discover Weekly Matcher</b> <br> <br>
+		</h1>
+
+		<div class="explanation">
+			An interactive site to view, compare and listen to your friends’ Spotify Discover Weekly playlists. 
+		</div>
+
+		<br> <br>
+	</div>
+
+	<div class = "col-xs-12 buttons">
 		<% if (!facebook || !spotify) { %>
 			<% if (!facebook) { %>
 				<a href='#' class="facebook-btn btn btn-lg btn-info" role="button"> Log in to Facebook </a>

@@ -95,7 +95,7 @@ router.get('/', function (req, res){
 router.get('/logout', function (req, res) { 
 	req.session.facebookId = false; 
 	req.session.spotifyId = false; 
-	req.session.facebookToken = false;x
+	req.session.facebookToken = false;
 	res.redirect('/login');
 }); 
 
@@ -338,7 +338,10 @@ function searchUsers (search, page, callback) {
 	}
 	MongoClient.connect(mongoUrl, function (err, db) {
 		db.collection('users').find(
-			{name: {$regex:search,  $options: 'i'}},
+			{
+				name: {$regex:search,  $options: 'i'},
+				facebook_id:{$exists:true}
+			},
 			{facebook_id:1, name:1},
 			{limit: 10, offset:page}).toArray(function (err, users){
 
