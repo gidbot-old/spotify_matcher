@@ -30,46 +30,6 @@
 	
 </style>
 
-<script>
- 
-$(function() {
-
-	$('.facebook-share').click(function (){
-		FB.ui({
-		  method: 'share',
-		  href: 'www.discover-weekly.com',
-		}, function(response){});
-	});
-
-    $('.facebook-message').click(function(){
-    	FB.ui({
-		  method: 'send',
-		  link: 'www.discover-weekly.com'
-		});
-    });
-	
-
-	window.fbAsyncInit = function() {
-		FB.init({
-			appId      : '1504441939859902',
-			// appId      : '1505548576415905',
-			xfbml      : true,
-			version    : 'v2.5'
-		});
-	};
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
-});
-
-</script>
-
 <body>
 
 	<h2> No Friends </h2>

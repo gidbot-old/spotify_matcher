@@ -77,6 +77,46 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 
 	</style>
 
+	<script>
+ 
+	$(function() {
+
+		$('.facebook-share').click(function (){
+			FB.ui({
+			  method: 'share',
+			  href: 'www.discover-weekly.com',
+			}, function(response){});
+		});
+
+	    $('.facebook-message').click(function(){
+	    	FB.ui({
+			  method: 'send',
+			  link: 'www.discover-weekly.com'
+			});
+	    });
+		
+
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId      : '1504441939859902',
+				// appId      : '1505548576415905',
+				xfbml      : true,
+				version    : 'v2.5'
+			});
+		};
+	  // Load the SDK asynchronously
+	  (function(d, s, id) {
+	    var js, fjs = d.getElementsByTagName(s)[0];
+	    if (d.getElementById(id)) return;
+	    js = d.createElement(s); js.id = id;
+	    js.src = "//connect.facebook.net/en_US/sdk.js";
+	    fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
+
+	});
+
+	</script>
+
 	<nav class="navbar navbar-default">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
@@ -90,7 +130,7 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 	   	<div class="collapse navbar-collapse" id="myNavbar">
 	   		<ul class="nav navbar-nav navbar-left">
 		    	<li> <a href="/logout"> Logout </a></li>
-		    	<li> <a href="/discover"> Top Match </a></li>
+		    	<li> <a href="/top-match"> Top Match </a></li>
 		    	<li> <a href="/about"> About </a></li>
 	    	</ul>
 		

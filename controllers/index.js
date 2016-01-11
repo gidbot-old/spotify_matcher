@@ -278,7 +278,7 @@ router.get('/compare/:facebook_id', function (req, res) {
 
 }); 
 
-router.get('/discover', function (req, res) {
+router.get('/top-match', function (req, res) {
 	if (!req.session.facebookId && !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
@@ -392,7 +392,11 @@ router.get('/not-found', function (req, res) {
 
 
 router.get('/about', function (req, res) {
-	res.render('about');
+	if (!req.session.facebookId){
+		res.redirect('/login');
+	} else {
+		res.render('about');
+	}
 });
 
 var discoverUsers = function(currentId, db, callback) {
