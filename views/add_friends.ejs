@@ -4,7 +4,8 @@
 <% include ./navbar.ejs %>
 
 <head>
-	<script type="text/javascript" src= "/js/spotify.js"></script>
+	 <!-- Twitter web intent -->
+    <script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
 </head>
 
 <style type="text/css">
@@ -23,16 +24,65 @@
 		font-size: 24px;
 		margin-top: 20px;
 	} 
+	.message { 
+		text-align: center;
+	}
 	
 </style>
+
+<script>
+ 
+$(function() {
+
+	$('.facebook-share').click(function (){
+		FB.ui({
+		  method: 'share',
+		  href: 'www.discover-weekly.com',
+		}, function(response){});
+	});
+
+    $('.facebook-message').click(function(){
+    	FB.ui({
+		  method: 'send',
+		  link: 'www.discover-weekly.com'
+		});
+    });
+	
+
+	window.fbAsyncInit = function() {
+		FB.init({
+			appId      : '1504441939859902',
+			// appId      : '1505548576415905',
+			xfbml      : true,
+			version    : 'v2.5'
+		});
+	};
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+});
+
+</script>
 
 <body>
 
 	<h2> No Friends </h2>
 
-	<h3>
-		You don't have any friends on the app yet. Invite them to join on Facebook. 
-	</h3>
+	<div class='col-lg-12 message'>
+		<h4>
+			You don't have any friends on the app yet. <br> <br> Invite them to join! 
+		</h4>
+		
+		<h3>
+			<a href='https://twitter.com/intent/tweet?text=Hi friends, check out www.discover-weekly.com so we can compare our gnarly Spotify playlists.'>Tweet</a> | <a class='facebook-share'>Share</a> | <a class='facebook-message'>Message</a>
+		</h3>
+	</div>
 
 </body>
 
