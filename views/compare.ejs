@@ -89,7 +89,7 @@ $(function() {
 		<h3 class="user-name">
 			<%- currentDisplayName %>
 		</h3>
-		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%-currentDwId %>"> Discover Weekly Playlist </a>
+		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%-currentDwId %>"> Open <%- currentDisplayName.split(' ')[0];%>'s Playlist </a>
 		
 		<div class="playlist-container">
 			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- currentDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>
@@ -131,7 +131,9 @@ $(function() {
 		<h3 class="user-name">
 			<%-  otherDisplayName %>
 		</h3>
-		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%- otherDwId %>"> Discover Weekly Playlist </a>
+		<a class="discover-text" target="_blank" href="http://open.spotify.com/user/spotifydiscover/playlist/<%- otherDwId %>">
+		Open <%- otherDisplayName.split(' ')[0];%>'s Playlist </a>	
+		 </a>
 
 		<div class="playlist-container">
 			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- otherDwId %>&theme=white" width="300" height="80" frameborder="0" allowtransparency="true"></iframe>

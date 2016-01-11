@@ -93,7 +93,9 @@ router.get('/', function (req, res){
 }); 
 
 router.get('/logout', function (req, res) { 
-	req.session = false; 
+	req.session.facebookId = false; 
+	req.session.spotifyId = false; 
+	req.session.facebookToken = false;x
 	res.redirect('/login');
 }); 
 
@@ -238,7 +240,7 @@ router.get('/compare/:facebook_id', function (req, res) {
 					if (err) {console.log(err);}
 					if (!user) {
 						db.close();
-						res.redirect('/not_found');
+						res.redirect('/not-found');
 					}
 					db.collection('users').findOne({facebook_id: req.session.facebookId}, function (err, user2){
 						db.close();
@@ -269,7 +271,7 @@ router.get('/compare/:facebook_id', function (req, res) {
 				});
 			} catch (e){
 				db.close();
-				res.redirect('/not_found');
+				res.redirect('/not-found');
 			}
 		});
 	}
@@ -371,13 +373,23 @@ router.post('/search', function (req, res) {
 	}
 }); 
 
-router.get('/not_found', function (req, res) {
+router.get('/add-friends', function (req, res) {
+	if (!req.session.facebookId){
+		res.redirect('/login');
+	} else {
+		res.render('add_friends');
+	}
+}); 
+
+
+router.get('/not-found', function (req, res) {
 	if (!req.session.facebookId){
 		res.redirect('/login');
 	} else {
 		res.status(404).render('not_found');
 	}
 }); 
+
 
 router.get('/about', function (req, res) {
 	res.render('about');

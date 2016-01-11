@@ -5,10 +5,11 @@ var express = require('express')
 , port = process.env.PORT || 3000
 , path = require('path')
 , router = express.Router()
-, session = require('express-session');
+, session = require('express-session')
+, favicon = require('serve-favicon');
 
 
-// app.use(favicon(path.join(__dirname,'public','img','favicon2.ico')));
+app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 
 app.use(function (req, res, next) {
   var url = req.get('host');
@@ -40,7 +41,7 @@ app.use(require('./controllers'))
 
 
 app.use(function(req, res, next) {
-	res.redirect('/not_found');
+	res.redirect('/not-found');
 });
 
 app.listen(port, function() {
