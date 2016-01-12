@@ -1,0 +1,98 @@
+<html>
+
+<title> Home </title>
+
+<% include ./navbar.ejs %>
+<% if (!users) {
+	users = [];
+}%>
+<head>
+	<script type="text/javascript" src= "/js/spotify.js"></script>
+</head>
+
+<style type="text/css">
+	body {
+		font-family: Menlo, 'Andale Mono', monospace;
+	}	
+
+	h2 {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 75px;
+	}
+
+	.profile-pic {
+		width: 200px; 
+		height: 200px;
+		background-position: center; 
+		background-size:100% auto;
+		margin-top: 20px;
+	}
+
+	.profile-container { 
+		text-align: center;
+	}
+	.friend-profile {
+		background-position: center; 
+		background-size:100% auto;
+	}
+	.friend-user-name {
+		text-align: center;
+		margin-top: 10px;
+		margin-bottom: 20px; 
+	}
+	.friends-container {
+		margin-top: 50px;
+	}
+	.friends-heading{ 
+		text-align: center;
+	}
+</style>
+
+<body>
+
+	<div class='col-xs-12 profile-container'>
+
+		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- currentFacebookId %>/picture?type=large)'>
+
+		<h3 class="current-user-name">
+			<%- currentDisplayName %>
+		</h3>
+
+		<div class="action-btns">
+			<a href='/random' class='action'> Random</a>
+			|
+			<a href='/best-match' class='action' role="button"> Best Match</a>
+			| 
+			<a href='/logout' class='action' role="button"> Log Out</a>
+		</div>
+
+	</div>
+
+	<div class='col-xs-offset-1 col-xs-10 friends-container'> 
+		<% if (users.length < 1)  { %> 
+			<h2>
+				No Users Found
+			</h2>
+		<% } else { %> 
+			<h3 class='friends-heading col-sm-2 col-xs-3'>
+				Friends:
+			</h3>
+			<div class = 'col-xs-12'></div>
+			<%
+			for (var i = 0; i < users.length; i++) {
+				var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
+			%> 
+			<a href='/compare/<%- id %>'>
+				<div class = "col-sm-2 col-xs-4 profile-container">
+					<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large);'>
+					<div class="friend-user-name"><%- users[i].name%></div>
+				</div>
+			</a>
+		<% } } %>
+	</div>
+
+	<br> <br>
+
+</body>
+</html>

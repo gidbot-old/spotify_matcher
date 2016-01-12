@@ -89,12 +89,28 @@ function getIntersection (array1, array2) {
 }
 
 router.get('/', function (req, res){
-	res.redirect('login');
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login');
+	} else {
+		FB.api('me/friends', 'get', {limit: 30},  function (fb_response) {
+		  if(!fb_response || fb_response.error) {
+		    res.status(500).send('Facebook Error');	
+			} else {
+		  		res.render('home', 
+		  			{
+		  				users: fb_response.data,
+						currentDisplayName: req.session.name,
+						currentFacebookId: req.session.facebookId
+		  			});
+		  	}
+		});
+	}
 }); 
 
 router.get('/logout', function (req, res) { 
 	req.session.facebookId = false; 
 	req.session.spotifyId = false; 
+	req.session.name = false; 
 	req.session.facebookToken = false;
 	res.redirect('/login');
 }); 
@@ -136,6 +152,7 @@ router.get('/auth/spotify/callback', function (req, res){
 							db.collection('users').update({spotify_id: result.spotify_id}, {$set:{facebook_id:req.session.facebookId}}, function (err, response) {
 								db.close();
 								req.session.spotifyId = result.spotify_id; 
+								req.session.name = result.name;
 								res.redirect(302, '/login'); 
 							});
 						}); 
@@ -172,6 +189,7 @@ router.post('/facebook-login', function (req, res) {
 							idExists(result.ops[0].facebook_id, spotify, function (result) {
 								if (result) {
 									req.session.spotifyId = result.spotifyId; 
+									req.session.name = result.name;
 									res.status(200).send({spotify:true});
 								} else {
 									res.status(200).send({spotify:false});
@@ -184,6 +202,7 @@ router.post('/facebook-login', function (req, res) {
 				req.session.facebookId = req.body.authResponse.userID; 
 				if (doc.spotify_id) {
 					req.session.spotifyId = doc.spotify_id; 
+					req.session.name = doc.name;
 					res.status(200).send({facebook:true, spotify:true});
 				} else{ 
 					res.status(200).send({facebook:true, spotify:false});
@@ -223,6 +242,7 @@ router.post('/spotify-login', function (req, res) {
 						db.close();
 					}); 
 					req.session.spotifyId = req.body.spotify_id; 
+					req.session.name = req.body.name;
 					res.status(200).send('User Added');
 				}
 			}); 
@@ -278,8 +298,8 @@ router.get('/compare/:facebook_id', function (req, res) {
 
 }); 
 
-router.get('/top-match', function (req, res) {
-	if (!req.session.facebookId && !req.session.spotifyId) {
+router.get('/best-match', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
@@ -293,7 +313,7 @@ router.get('/top-match', function (req, res) {
 }); 
 
 router.get('/random', function (req, res) { 
-	if (!req.session.facebookId && !req.session.spotifyId) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
@@ -312,7 +332,7 @@ router.get('/random', function (req, res) {
 }); 
 
 router.get('/friends', function (req, res) {
-	if (!req.session.facebookId && !req.session.spotifyId) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		FB.api('me/friends', 'get', {limit: 30},  function (fb_response) {
@@ -366,7 +386,7 @@ function getSearch (req, res) {
 router.get('/search', getSearch); 
 
 router.post('/search', function (req, res) {
-	if (!req.session.facebookId) { 
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		searchUsers(req.body.search, req.query.page, function (users){
@@ -377,7 +397,7 @@ router.post('/search', function (req, res) {
 }); 
 
 router.get('/add-friends', function (req, res) {
-	if (!req.session.facebookId){
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		res.render('add_friends');
@@ -386,7 +406,7 @@ router.get('/add-friends', function (req, res) {
 
 
 router.get('/not-found', function (req, res) {
-	if (!req.session.facebookId){
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		res.status(404).render('not_found');
@@ -395,7 +415,7 @@ router.get('/not-found', function (req, res) {
 
 
 router.get('/about', function (req, res) {
-	if (!req.session.facebookId){
+	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
 		res.render('about');

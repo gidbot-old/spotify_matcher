@@ -1,5 +1,5 @@
 <html>
-	<title>DW | About</title>
+	<title>About</title>
 	<% include ./navbar.ejs %>
 
 <style type="text/css">
@@ -9,35 +9,52 @@
 	.share-btns {
 		font-size: 18px;
 	}
+	h4 {
+		font-weight: bold;
+	}
 </style>
 
 <body>
 
-	<div class='col-xs-8 col-xs-offset-2' style="text-align: center; margin-top: 25px;">
+	<div class='col-xs-10 col-xs-offset-1' style=" margin-top: 25px;">
 
 		<h1>
 			<b>About</b> <br> <br>
 		</h1>
 
 
-		<h4> <b> What Does This Site Do? </b> </h4>
-		I’m a big fan of Spotify’s Discover Weekly playlist. Since its release, I’ve been curious to look at my friends’ playlists and to see how similar or different they were. This site lets you view, compare and listen to your friends’ DW playlists. 
-		
-		<br> <br>
-		Your <b><a href="/top-match">Top Match</a></b> is the person you have the most similar playlist to. However, the site is more exciting if you connect with <b><a href="/friends">Friends</a></b> through Facebook. 
-		<br> <br>
-		<b><a href="/random">Random</a></b> compares your profile to one of your Facebook friends' on the app. If none of them have registered, this feature will not work. 
+		<h4> What Does This Site Do? </h4>
+		- <b> <a href="/top-match">Top Match</a></b> is the person you have the most similar playlist to. 
+		<br>
+		- <b> <a href="/random">Random</a></b> compares your profile to one of your Facebook friends' on the app. If none of them are registered, this feature will not work. 
+		<br>
+		- <b> <a href="/friends">Friends</a></b> shows you which of your facebook friends are on the app.
+		<br>
+		- Use the search box in the top right to find any user on the app.
 		<br> <br>
 
-		<h4> <b> Don't have a ton of Friends on the app? Invite Them! </b> </h4>
+		<h4>  Friends  </h4>
+		Comparing your playlist to people you don't know isn't terribly exciting. Its much more fun to look at your friends playlists!
+		<br><br>
+
+		<h4> Don't have a ton of Friends on the app? Invite Them! </h4>
 		<div class ="share-btns">
 			<a href='https://twitter.com/intent/tweet?text=Hi friends, check out www.discover-weekly.com so we can compare our gnarly Spotify playlists.'>Tweet</a> | <a class='facebook-share'>Share</a> | <a class='facebook-message'>Message</a>
 		</div>
-		<br> <br>
-		<h4> <b> Are you affiliated with Spotify? </b> </h4>
+		<br> 
+
+		<h4>  Why Make The Site?  </h4>
+		I’m a big fan of Spotify’s Discover Weekly playlist. Since its release, I’ve been curious to look at my friends’ playlists and to see how similar or different they were. Unfortunately, Spotify makes it relatively difficult to find someone else's Discover Weekly, but hopefully this will fix part of the problem!
+		<br><br>
+
+		<h4>  How Does The Site Work?  </h4>
+		The formula for calculating match percentage is pretty simply. Discover Weekly consists of 30 songs, performed by 30 artists. We total all the common artists and tracks between two playlist, divide by 60 (30+30=60) and then multiply by 100. So for eg, if you and Bill Withers have 5 tracks and 10 artists in common, your playlists have a 25% match rate. ((15/60) * 100 = 25%)!
+		<br><br>
+		
+		<h4> Are you affiliated with Spotify? </h4>
 		No. This is an app built on top of Spotify’s public api. 
 		<br> <br>
-		<h4> <b> Issues or Suggestions? </b> </h4>
+		<h4> Issues or Suggestions? </h4>
 		Please email me at <a href="mailto:bot.industries@gmail.com" target="_top">bot.industries@gmail.com</a>
 
 		<br> <br>

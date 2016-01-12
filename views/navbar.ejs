@@ -49,7 +49,7 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 			font-size: 16px;
 		}
 		.navbar-left {
-			font-size: 16px;
+			font-size: 18px;
 		}
 		.search-box {
 			height: 30px;
@@ -61,6 +61,22 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 		.navbar-toggle.navbar-left {
 		  float: left;
 		  margin-left: 10px;
+		}
+		.action-btns {
+			font-size: 16px;
+			text-align: center;
+		}
+		.action { 
+			color: #239BC9;
+		}
+		.action:hover{
+			color: #1e86ae;
+		}
+		.action:active {
+			color: #1e86ae;
+		}
+		.action:visited {
+			color: #1e86ae;
 		}
 
 		/* mobile navbar */
@@ -98,8 +114,8 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 
 		window.fbAsyncInit = function() {
 			FB.init({
-				appId      : '1504441939859902',
-				// appId      : '1505548576415905',
+				// appId      : '1504441939859902',
+				appId      : '1505548576415905',
 				xfbml      : true,
 				version    : 'v2.5'
 			});
@@ -129,13 +145,12 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 
 	   	<div class="collapse navbar-collapse" id="myNavbar">
 	   		<ul class="nav navbar-nav navbar-left">
-		    	<li> <a href="/logout"> Logout </a></li>
-		    	<li> <a href="/top-match"> Top Match </a></li>
+		    	<li> <a href="/"> Home </a></li>
+		    	<li> <a href="/friends"> Friends </a></li>
 		    	<li> <a href="/about"> About </a></li>
 	    	</ul>
 		
 			<ul class="nav navbar-nav navbar-right">
-				<li> <a href="/friends"> Friends </a></li>
 				<li>
 				<form action='/search' method='post'>
 		        	<input name='search' type="text" id="search-text" class="form-control search-box" placeholder="Find User">
