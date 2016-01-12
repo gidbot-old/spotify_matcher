@@ -257,7 +257,6 @@ router.get('/compare/:facebook_id', function (req, res) {
 		MongoClient.connect(mongoUrl, function (err, db) { 
 			try {
 				db.collection('users').findOne({facebook_id: req.params.facebook_id}, function (err, user){
-					if (err) {console.log(err);}
 					if (!user) {
 						db.close();
 						res.redirect('/not-found');
@@ -304,10 +303,24 @@ router.get('/best-match', function (req, res) {
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
-			discoverUsers(req.session.spotifyId, db, function (facebook_id) {
-				db.close();
-				res.redirect(302, '/compare/'+ facebook_id);
+			FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
+			  if(!fb_response || fb_response.error) {
+			    res.status(500).send('Facebook Error');
+			  } else {
+			  	if (fb_response.data.length < 1) {
+			  		res.render('add_friends');
+			  	} else { 
+			  		var fbIds = fb_response.data.map(function(response) {
+					  return response.id;
+					});
+			  		discoverUsers(fbIds, req.session.spotifyId, db, function (facebook_id) {
+						db.close();
+						res.redirect(302, '/compare/'+ facebook_id);
+					});
+			  	}
+			  }
 			});
+
 		});
 	}
 }); 
@@ -422,13 +435,18 @@ router.get('/about', function (req, res) {
 	}
 });
 
-var discoverUsers = function(currentId, db, callback) {
+var discoverUsers = function(fbIds, currentId, db, callback) {
 	var artistsMax = -1;
 	var tracksMax = -1; 
 	var match = false; 
 	var collection = db.collection('users');	
 	collection.findOne({spotify_id: currentId}, function(err, currentUser) {
-		var cursor = collection.find({tracks:{'$exists':true}, facebook_id:{'$exists':true}, spotify_id: {"$ne": currentUser.spotify_id}});
+		var findJson = {
+			tracks:{'$exists':true}, 
+			facebook_id:{'$in':fbIds}, 
+			spotify_id: {"$ne": currentUser.spotify_id}
+		}
+		var cursor = collection.find(findJson);
 		cursor.each(function(err, user2) {
 		  if (user2 != null && currentUser.spotify_id != user2.spotify_id) {
 		    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
