@@ -258,7 +258,7 @@ router.get('/compare/:facebook_id', function (req, res) {
 			try {
 				db.collection('users').findOne({facebook_id: req.params.facebook_id}, function (err, user){
 					if (!user) {
-						db.collection('fb_users').findOne({facebook_id: req.session.facebookId}, function (err, fb_user) {
+						db.collection('fb_users').findOne({facebook_id: req.params.facebookId}, function (err, fb_user) {
 							db.close();
 							if (!fb_user) { 
 								res.redirect('/not-found');
