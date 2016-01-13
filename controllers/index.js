@@ -217,7 +217,7 @@ router.get('/spotify-login', function (req, res) {
 	if(!req.session.spotifyToken) {
 		res.redirect('/login');
 	} else {
-		res.render('spotify-login', {token: req.session.spotifyToken}); 
+		res.render('spotify_login', {token: req.session.spotifyToken}); 
 	}
 }); 
 
@@ -258,35 +258,42 @@ router.get('/compare/:facebook_id', function (req, res) {
 			try {
 				db.collection('users').findOne({facebook_id: req.params.facebook_id}, function (err, user){
 					if (!user) {
-						db.close();
-						res.redirect('/not-found');
-					}
-					db.collection('users').findOne({facebook_id: req.session.facebookId}, function (err, user2){
-						db.close();
-						var artistsInCommon = getIntersection(user.sorted_artists, user2.sorted_artists);
-						var tracksInCommon = getIntersection(user.sorted_tracks, user2.sorted_tracks);
-						var artists = {};
-						var tracks = {};
-						for (var i = 0; i < artistsInCommon.length; i++){
-							artists[artistsInCommon[i]] = user2.artists[artistsInCommon[i]];
-						}
-						for (var i = 0; i < tracksInCommon.length; i++){
-							tracks[tracksInCommon[i]] = user2.tracks[tracksInCommon[i]];
-						}
-						var percent = ((tracksInCommon.length + artistsInCommon.length)/60*100).toFixed(2); 
-						res.render('compare', {
-							percent: percent,  
-							tracks: tracks, 
-							artists: artists, 
-							currentDwId: user2.dw_spotify_id,
-							otherDwId: user.dw_spotify_id,
-							currentDisplayName: (user2.name)? user2.name: user2.spotify_id,
-							otherDisplayName: (user.name)? user.name: user.spotify_id,
-							currentFacebookId: user2.facebook_id,
-							otherFacebookId: user.facebook_id
-						});
+						db.collection('fb_users').findOne({facebook_id: req.session.facebookId}, function (err, fb_user) {
+							db.close();
+							if (!fb_user) { 
+								res.redirect('/not-found');
+							} else { 
+								res 
+							}
+						}); 
+					} else {
+						db.collection('users').findOne({facebook_id: req.session.facebookId}, function (err, user2){
+							db.close();
+							var artistsInCommon = getIntersection(user.sorted_artists, user2.sorted_artists);
+							var tracksInCommon = getIntersection(user.sorted_tracks, user2.sorted_tracks);
+							var artists = {};
+							var tracks = {};
+							for (var i = 0; i < artistsInCommon.length; i++){
+								artists[artistsInCommon[i]] = user2.artists[artistsInCommon[i]];
+							}
+							for (var i = 0; i < tracksInCommon.length; i++){
+								tracks[tracksInCommon[i]] = user2.tracks[tracksInCommon[i]];
+							}
+							var percent = ((tracksInCommon.length + artistsInCommon.length)/60*100).toFixed(2); 
+							res.render('compare', {
+								percent: percent,  
+								tracks: tracks, 
+								artists: artists, 
+								currentDwId: user2.dw_spotify_id,
+								otherDwId: user.dw_spotify_id,
+								currentDisplayName: (user2.name)? user2.name: user2.spotify_id,
+								otherDisplayName: (user.name)? user.name: user.spotify_id,
+								currentFacebookId: user2.facebook_id,
+								otherFacebookId: user.facebook_id
+							});
 
-					});
+						});
+					}
 				});
 			} catch (e){
 				db.close();
@@ -417,6 +424,14 @@ router.get('/add-friends', function (req, res) {
 	}
 }); 
 
+
+router.get('/user-incomplete', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login');
+	} else {
+		res.render('user_incomplete');
+	}
+}); 
 
 router.get('/not-found', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
