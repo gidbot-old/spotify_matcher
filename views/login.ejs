@@ -1,6 +1,8 @@
 <html>
 
 <title> Login </title>
+<% include ./headers.ejs %>
+
 
 <head>
 
@@ -61,7 +63,7 @@
  
 $(function() {
 
-	$('.facebook-btn').click(function (){
+	$('.facebook-login-btn').click(function (){
 		
 		FB.login(function(response) {
 			if (response.authResponse) {
@@ -84,24 +86,6 @@ $(function() {
 
 	});
 	
-
-window.fbAsyncInit = function() {
-	FB.init({
-		appId      : '1504441939859902',
-		// appId      : '1505548576415905',
-		xfbml      : true,
-		version    : 'v2.5'
-	});
-};
-  // Load the SDK asynchronously
-  (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-
 });
 
 </script>
@@ -122,7 +106,7 @@ window.fbAsyncInit = function() {
 	<div class = "col-xs-12 buttons">
 		<% if (!facebook || !spotify) { %>
 			<% if (!facebook) { %>
-				<a href='#' class="facebook-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
+				<a href='#' class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
 			<% } else { %>
 				<a href='/auth/spotify' class="btn btn-lg btn-success" role="button"> Add Spotify </a>
 			<% } %> 

@@ -31,6 +31,7 @@
 
 	.profile-container { 
 		text-align: center;
+		margin-top: 15px;
 	}
 	.friend-profile {
 		background-position: center; 
@@ -52,6 +53,9 @@
 		text-align: center;
 		margin-bottom: 25px;
 	}
+	.bottom {
+		margin-bottom: 25px;
+	}
 </style>
 
 <body>
@@ -65,11 +69,14 @@
 		</h3>
 
 		<div class="action-btns">
+			<a href='/last-week' class='action' role="button"> Last Week</a>
+			|
 			<a href='/random' class='action'> Random</a>
 			|
 			<a href='/best-match' class='action' role="button"> Best Match</a>
 			| 
 			<a href='/logout' class='action' role="button"> Log Out</a>
+
 		</div>
 
 	</div>
@@ -96,16 +103,25 @@
 			for (var i = 0; i < users.length; i++) {
 				var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
 			%> 
+			<% if (i%6==0) {  %> 
+					<div class='row'> 
+			<%  } %> 
+
 			<a href='/compare/<%- id %>'>
 				<div class = "col-sm-2 col-xs-4 profile-container">
 					<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large);'>
 					<div class="friend-user-name"><%- users[i].name%></div>
 				</div>
 			</a>
+
+			<% if (i%6==5) { %> 
+				</div>
+			<%  } %> 
+
 		<% } } %>
 	</div>
 
-	<br> <br>
+	<div class="row bottom"> </div>
 
 </body>
 </html>

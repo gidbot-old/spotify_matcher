@@ -92,9 +92,9 @@ router.get('/', function (req, res){
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {limit: 30},  function (fb_response) {
+		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 30},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
-		    res.status(500).send('Facebook Error');	
+		  		res.redirect('/logout');
 			} else {
 		  		res.render('home', 
 		  			{
@@ -172,7 +172,6 @@ router.post('/facebook-login', function (req, res) {
 		res.status(401).send({login: 'rejected'});
 	} else {
 		req.session.facebookToken = req.body.authResponse.accessToken;
-		FB.setAccessToken(req.body.authResponse.accessToken);
 
 		idExists(req.body.authResponse.userID, facebook, function (doc){
 			if (!doc){
@@ -310,9 +309,9 @@ router.get('/best-match', function (req, res) {
 	} else {
 		MongoClient.connect(mongoUrl, function (err, db) {
 			assert.equal(null, err);
-			FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
+			FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 200},  function (fb_response) {
 			  if(!fb_response || fb_response.error) {
-			    res.status(500).send('Facebook Error');
+			  		res.redirect('/logout');
 			  } else {
 			  	if (fb_response.data.length < 1) {
 			  		res.render('add_friends');
@@ -336,9 +335,9 @@ router.get('/random', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {limit: 200},  function (fb_response) {
+		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 200},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
-		    res.status(500).send('Facebook Error');
+		  	res.redirect('/logout');
 		  } else {
 		  	if (fb_response.data.length < 1) {
 		  		res.render('add_friends');
@@ -355,11 +354,9 @@ router.get('/friends', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {limit: 30},  function (fb_response) {
+		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 30},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
-		    
-		    res.status(500).send('Facebook Error');
-			
+		  		res.redirect('/logout');
 			} else {
 		  		if (fb_response.data.length < 1) {
 		  			res.render('add_friends');
@@ -438,6 +435,14 @@ router.get('/not-found', function (req, res) {
 		res.redirect('/login');
 	} else {
 		res.status(404).render('not_found');
+	}
+}); 
+
+router.get('/last-week', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login');
+	} else {
+		res.render('last_week');
 	}
 }); 
 
