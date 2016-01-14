@@ -40,12 +40,14 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 				cookie: true,
 				version    : 'v2.5'
 			});
-			
-			FB.getLoginStatus(function(response) {
-			  if (!(response.status === 'connected')) {
-			  	window.location.replace("/logout");
-			  }
-			});
+			if (window.location.pathname != '/login'){
+				FB.getLoginStatus(function(response) {
+				  if (!(response.status === 'connected')) {
+				  	window.location.replace("/logout");
+				  }
+				});				
+			}
+
 		};
 	  // Load the SDK asynchronously
 	  (function(d, s, id) {
