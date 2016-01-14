@@ -32,14 +32,24 @@
 		height: 150px;
 		background-size:100% auto;
 	}
-
 	.profile-container { 
 		text-align: center;
 		margin-top: 50px;
 	}
+	.friend-user-name {
+		text-align: center;
+		margin-top: 10px;
+		margin-bottom: 20px; 
+	}
+	.friend-profile {
+		background-position: center; 
+		background-size:100% auto;
+	}
 </style>
 
 <body>
+
+	<div class='col-xs-offset-1 col-xs-10 friends-container'> 
 
 	<% if (users.length < 1)  { %> 
 		<h2>
@@ -50,16 +60,27 @@
 			<%- title %>
 		</h2>
 		<%
-		for (var i = 0; i < users.length; i++) {
-			var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
-		%> 
-		<a href='/compare/<%- id %>'>
-			<div class = "col-md-3 col-sm-4 profile-container">
-				<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large)'>
-				<h3 class="user-name"><%- users[i].name%></h3>
-			</div>
-		</a>
-	<% } } %>
+			for (var i = 0; i < users.length; i++) {
+				var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
+			%> 
+			<% if (i%6==0) {  %> 
+					<div class='row'> 
+			<%  } %> 
+
+			<a href='/compare/<%- id %>'>
+				<div class = "col-sm-2 col-xs-4 profile-container">
+					<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large);'>
+					<div class="friend-user-name"><%- users[i].name%></div>
+				</div>
+			</a>
+
+			<% if (i%6==5) { %> 
+				</div>
+			<%  } %> 
+
+		<% } } %>
+
+	</div>
 
 </body>
 </html>

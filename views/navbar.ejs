@@ -78,32 +78,6 @@
 	</style>
 
 	<script>
- 
-	$(function() {
-
-		mixpanel.track("Page Hit");
-
-		FB.getLoginStatus(function(response) {
-		  if (!(response.status === 'connected')) {
-		  	window.location.replace("/logout");
-		  }
-		});
-
-		$('.facebook-share').click(function (){
-			FB.ui({
-			  method: 'share',
-			  href: 'www.discover-weekly.com',
-			}, function(response){});
-		});
-
-	    $('.facebook-message').click(function(){
-	    	FB.ui({
-			  method: 'send',
-			  link: 'www.discover-weekly.com'
-			});
-	    });
-		
-	});
 
 	</script>
 
@@ -122,6 +96,7 @@
 		    	<li> <a href="/"> Home </a></li>
 		    	<li> <a href="/friends"> Friends </a></li>
 		    	<li> <a href="/about"> About </a></li>
+		    	<li> <a href="/invite"> Invite </a></li>
 	    	</ul>
 		
 			<ul class="nav navbar-nav navbar-right">

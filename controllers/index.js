@@ -455,6 +455,14 @@ router.get('/about', function (req, res) {
 	}
 });
 
+router.get('/invite', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login');
+	} else {
+		res.render('add_friends');
+	}
+});
+
 var discoverUsers = function(fbIds, currentId, db, callback) {
 	var artistsMax = -1;
 	var tracksMax = -1; 
