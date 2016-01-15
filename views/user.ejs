@@ -1,6 +1,6 @@
 <html>
 
-<title> Home </title>
+<title> User | <%- otherDisplayName%> </title>
 
 <% include ./navbar.ejs %>
 <% if (!users) {
@@ -26,7 +26,6 @@
 		height: 200px;
 		background-position: center; 
 		background-size:100% auto;
-		margin-top: 20px;
 	}
 
 	.profile-container { 
@@ -46,58 +45,37 @@
 		margin-top: 50px;
 	}
 	.friends-heading{ 
-		text-align: center;
+		text-align: left;
 		padding-bottom: 10px;
 	}
-	.message { 
+	.playlist-container {
 		text-align: center;
 		margin-bottom: 25px;
+		margin-top: 25px;
 	}
-	.bottom {
-		margin-bottom: 25px;
-	}
+
 </style>
 
 <body>
 
-	<div class='col-xs-12 profile-container'>
+	<div class='col-sm-5 col-xs-12 profile-container'>
+		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- otherFacebookId %>/picture?type=large)'>
 
-		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- currentFacebookId %>/picture?type=large)'>
-
-		<h3 class="current-user-name">
-			<%- currentDisplayName %>
+		<h3 class="user-name">
+			<%- otherDisplayName %>
 		</h3>
 
 		<div class="action-btns">
-			<a href='/last-week' class='action' role="button"> Last Week</a>
-			|
-			<a href='/random' class='action'> Random</a>
-			|
-			<a href='/best-match' class='action' role="button"> Best Match</a>
-			| 
-			<a href='/logout' class='action' role="button"> Log Out</a>
-
+			<a href='/compare/<%- otherFacebookId %>' class='action' role="button"> Compare</a>
 		</div>
 
+		<div class="playlist-container">
+			<iframe src="https://embed.spotify.com/?uri=spotify:user:spotifydiscover:playlist:<%- otherDwId %>&theme=white" width="300" height="380" frameborder="0" allowtransparency="true"></iframe>
+		</div>
 	</div>
+	<div class = 'col-sm-7 col-xs-12'>
 
-	<div class='col-xs-offset-1 col-xs-10 friends-container'> 
-		<% if (users.length < 1)  { %> 
-			<h3 class='friends-heading'> No Friends </h3>
-
-			<div class='col-lg-12 message'>
-				<h4>
-					You don't have any friends on the app yet. <br> <br> Invite them to join! 
-				</h4>
-				
-				<h3>
-					<a href='https://twitter.com/intent/tweet?text=Hi friends, check out www.discover-weekly.com so we can compare our gnarly Spotify Discover Weekly playlists.'>Tweet</a> | <a class='facebook-share'>Share</a> | <a class='facebook-message'>Message</a>
-				</h3>
-			</div>
-		<% } else { %> 
-			<h3 class='friends-heading col-sm-2 col-xs-3'>
-				Friends:
-			</h3>
+		<h3 class='friends-heading'> Friends: </h3>
 			<div class = 'col-xs-12'></div>
 			<%
 			for (var i = 0; i < users.length; i++) {
@@ -108,7 +86,7 @@
 			<%  } %> 
 
 			<a href='/user/<%- id %>'>
-				<div class = "col-sm-2 col-xs-4 profile-container">
+				<div class = "col-sm-2 col-xs-3 profile-container">
 					<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(http://graph.facebook.com/<%- id %>/picture?type=large);'>
 					<div class="friend-user-name"><%- users[i].name%></div>
 				</div>
@@ -118,10 +96,11 @@
 				</div>
 			<%  } %> 
 
-		<% } } %>
+		<% } %>
+
 	</div>
 
-	<div class="row bottom"> </div>
-
 </body>
-</html>
+
+
+

@@ -92,7 +92,7 @@ router.get('/', function (req, res){
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 30},  function (fb_response) {
+		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 100},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
 		  		res.redirect('/logout');
 			} else {
@@ -246,6 +246,38 @@ router.post('/spotify-login', function (req, res) {
 				}
 			}); 
 		}); 
+	}
+});
+
+router.get('/user/:facebook_id', function (req, res) {
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login'); 
+	} else {
+		MongoClient.connect(mongoUrl, function (err, db) { 
+			db.collection('users').findOne({facebook_id: req.params.facebook_id}, function (err, user){
+				if (!user) {
+					db.collection('fb_users').findOne({facebook_id: req.params.facebook_id}, function (err, fb_user) {
+						db.close();
+						if (!fb_user) { 
+							res.redirect('/not-found');
+						} else { 
+							res.redirect('/user-incomplete');
+						}
+					}); 
+				} else {
+					db.close();
+					FB.api(req.params.facebook_id+'/friends', 'get', {access_token: req.session.facebookToken, limit: 100},  function (fb_response) {
+						res.render('user', {
+							otherDwId: user.dw_spotify_id,
+							otherDisplayName: (user.name)? user.name: user.spotify_id,
+							otherFacebookId: user.facebook_id, 
+							users: fb_response.data
+						});						  
+					  		
+					});
+				}
+			});
+		});
 	}
 });
 
