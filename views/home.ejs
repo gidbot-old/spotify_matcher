@@ -5,7 +5,11 @@
 <% include ./navbar.ejs %>
 <% if (!users) {
 	users = [];
-}%>
+} else {
+	users.sort(function(a, b) {
+	    return (a.name).localeCompare(b.name);
+	});
+} %>
 <head>
 	<script type="text/javascript" src= "/js/spotify.js"></script>
 </head>

@@ -386,7 +386,7 @@ router.get('/friends', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 30},  function (fb_response) {
+		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 100},  function (fb_response) {
 		  if(!fb_response || fb_response.error) {
 		  		res.redirect('/logout');
 			} else {
