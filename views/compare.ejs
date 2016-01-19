@@ -126,7 +126,10 @@ $(function() {
 	</div>
 
 	<div class = "col-md-4 profile-container">
-	<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- otherFacebookId %>/picture?type=large)'>
+
+	<a href='/user/<%- otherFacebookId %>'>
+		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- otherFacebookId %>/picture?type=large)'>
+	</a>
 		<h3 class="user-name">
 			<%-  otherDisplayName %>'s
 			<br>

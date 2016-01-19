@@ -31,9 +31,35 @@
 			Last Week's Playlist
 		</h2> 
 
-		<h3>
-			Your last week's playlist will show up after 1 week on the app
-		</h3>
+		<% if (!playlist) { %>
+			<h3>
+				Your last week's playlist will show up after 1 week on the app
+			</h3>
+		<% } else {  %>					
+				<div class="table-responsive">          
+					  <table class="table table-hover">
+					    <thead>
+					      <tr>
+					        <th></th>
+					        <th>Track</th>
+					        <th>Artist</th>
+					      </tr>
+					    </thead>
+					    <tbody>
+					    	<% 
+					    		var index = 1;
+					    		for (var id in playlist.tracks) { %>
+					    	  <tr>
+						        <td> <%- index++; %> </td>
+						        <td> <a target="_blank" href="https://open.spotify.com/track/<%- id %>"> <%- playlist.tracks[id].name %> </a> </td>
+						        <td> <%- playlist.tracks[id].artist %> </td>
+						      </tr>
+							<% } %> 
+					    </tbody>
+					  </table>
+				</div>
+
+		<% } %>
 	</div>
 
 </body>

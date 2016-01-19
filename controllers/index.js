@@ -32,9 +32,9 @@ function previousSpotify (token, callback) {
 	  .then(function(data) {
 	    MongoClient.connect(mongoUrl, function (err, db) {
 	    	db.collection('users').findOne({spotify_id: data.body.id}, function (err, result) {
-	    		db.close();
 	    		var toReturn = (!result) ? false : result;
 	    		callback(toReturn);
+	    		db.close();
 	    	}); 
 	    });
 	  }, function(err) {
@@ -50,8 +50,8 @@ function idExists (fb_id, service, callback) {
 				var toReturn = (!result) ? false : result;
 
 				if (toReturn) {
-					db.close();
 					callback(result); 
+					db.close();
 				} else {
 					db.collection('fb_users').findOne({facebook_id: fb_id}, function (err, result) {
 						db.close();
@@ -60,9 +60,9 @@ function idExists (fb_id, service, callback) {
 					});
 				}
     		} else {
-    			db.close();
     			var toReturn = (!result)? false : result;
     			callback(result); 
+    			db.close();
     		}
     	}); 
     });
@@ -474,7 +474,12 @@ router.get('/last-week', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		res.render('last_week');
+		MongoClient.connect(mongoUrl, function (err, db) {
+			db.collection('last_week').findOne({spotify_id: req.session.spotifyId}, function (err, playlist) {
+				res.render('last_week', {playlist: playlist});
+				db.close();
+			}); 		
+		});
 	}
 }); 
 
