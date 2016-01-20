@@ -8,17 +8,21 @@ var express = require('express')
 , session = require('express-session')
 , favicon = require('serve-favicon');
 
+var rejectedUrls = [
+  'discover-weekly.herokuapp.com',
+  'discover-weekly.com'
+  ]
+
+app.use(function (req, res, next) {
+  var url = req.get('host');
+  if (req.headers['x-forwarded-proto']!='https' || rejectedUrls.indexOf(url) > -1) {
+    res.redirect('https://www.discover-weekly.com');
+  } else {
+    next();
+  }
+});
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
-
-// app.use(function (req, res, next) {
-//   var url = req.get('host');
-//   if (req.headers['x-forwarded-proto'] == 'https') {
-//     res.redirect('http://discover-weekly.herokuapp.com/');
-//   } else {
-//     next();
-//   }
-// });
 
 app.use(session({ 
 	secret: 'keyboard_cat', 
