@@ -46,17 +46,17 @@ function previousSpotify (token, callback) {
 function idExists (fb_id, service, callback) {
 	User.findOne({facebook_id: fb_id}, function (err, result) {
 		if (err) throw err;
-			if (service == facebook) {
-				if (result) {
+		if (service == facebook) {
+			if (result) {
+				callback(result); 
+			} else {
+				FB_User.findOne({facebook_id: fb_id}, function (err, result) {
 					callback(result); 
-				} else {
-					FB_User.findOne({facebook_id: fb_id}, function (err, result) {
-						callback(result); 
-					}); 
-				}
-    		} else {
-    			callback(result); 
-    		}
+				}); 
+			}
+		} else {
+			callback(result); 
+		}
 	 
 	});
 }
@@ -162,7 +162,6 @@ router.post('/facebook-login', function (req, res) {
 		res.status(401).send({login: 'rejected'});
 	} else {
 		req.session.facebookToken = req.body.authResponse.accessToken;
-
 		idExists(req.body.authResponse.userID, facebook, function (doc){
 			if (!doc){
 				var new_user = new FB_User({facebook_id: req.body.authResponse.userID});
@@ -212,11 +211,16 @@ router.post('/spotify-login', function (req, res) {
 		res.status(401).send('Log in to Spotify First');
 	} else {
 		var new_user = new User(req.body);
+		new_user.facebook_id = req.session.facebookId; 
 		new_user.save(function (err, result) {
 			if (err) {
 				res.status(500).send('Database Error');
 			} else {
-				FB_User.remove({facebook_id: req.session.facebookId}); 
+				FB_User.remove({facebook_id: req.session.facebookId}, function (err){
+					if (err) {
+						console.log(err);
+					}
+				}); 
 				req.session.spotifyId = req.body.spotify_id; 
 				req.session.name = req.body.name;
 				res.status(200).send('User Added');
