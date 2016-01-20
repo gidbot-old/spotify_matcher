@@ -6,7 +6,9 @@ var express = require('express')
 , path = require('path')
 , router = express.Router()
 , session = require('express-session')
-, favicon = require('serve-favicon');
+, favicon = require('serve-favicon')
+, mongoose = require('mongoose')
+, config = require('./config');
 
 var rejectedUrls = [
   'discover-weekly.herokuapp.com',
@@ -21,6 +23,8 @@ app.use(function (req, res, next) {
     next();
   }
 });
+
+mongoose.connect(config.mongo_url);
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 
