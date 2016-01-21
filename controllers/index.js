@@ -81,7 +81,7 @@ function getIntersection (array1, array2) {
 	return inCommon;
 }
 
-router.get('/', function (req, res){
+router.get('/home', function (req, res){
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
@@ -108,6 +108,13 @@ router.get('/logout', function (req, res) {
 	res.redirect('/login');
 }); 
 
+router.get('/', function (req, res) {  
+	res.render('login', {
+		facebook: (!req.session.facebookId) ? false: true, 
+		spotify: (!req.session.spotifyId) ? false: true
+	});
+}); 
+
 router.get('/login', function (req, res) {  
 	res.render('login', {
 		facebook: (!req.session.facebookId) ? false: true, 
@@ -127,7 +134,7 @@ router.get('/auth/spotify', function (req, res) {
 
 router.get('/auth/spotify/callback', function (req, res){
 	if (!req.session.facebookId || (req.session.facebookId && req.session.spotifyId)) {
-		res.direct('/');
+		res.direct('/login');
 	}  else  {
 		var code = req.query.code; 
 		spotifyApi.authorizationCodeGrant(code)
