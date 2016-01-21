@@ -69,7 +69,7 @@
 		</h2>
 		<%
 			for (var i = 0; i < users.length; i++) {
-				var id = (users[i].id) ? users[i].id : users[i].facebook_id; 
+				var id =  (users[i].facebook_id) ? users[i].facebook_id : users[i].id; 
 			%> 
 			<% if (i%6==0) {  %> 
 					<div class='row'> 
