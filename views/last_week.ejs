@@ -2,10 +2,7 @@
 <title> Last Week </title>
 <% include ./navbar.ejs %>
 
-<script> 
-
-</script>
-
+<% username = username.split(' ')[0]; %>
 
 <style type="text/css">
 	body {
@@ -15,7 +12,7 @@
 	h2 {
 		text-align: center;
 		font-size: 36px;
-		margin-top: 50px;
+		margin-top: 25px;
 	}
 
 	h3 { 
@@ -23,20 +20,24 @@
 		font-size: 24px;
 		margin-top: 20px;
 	} 
+
+	.playlist {
+		margin-top: 50px;
+	}
 </style>
 
 <body>
 	<div class='col-xs-10 col-xs-offset-1'>
 		<h2> 
-			Last Week's Playlist
+			<%- username %> Playlist from Last Week
 		</h2> 
 
 		<% if (!playlist) { %>
 			<h3>
-				Your last week's playlist will show up after 1 week on the app
+				Last week's playlist will show up after 1 week on the app
 			</h3>
 		<% } else {  %>					
-				<div class="table-responsive">          
+				<div class="playlist table-responsive">          
 					  <table class="table table-hover">
 					    <thead>
 					      <tr>

@@ -438,13 +438,31 @@ router.get('/not-found', function (req, res) {
 	}
 }); 
 
-router.get('/last-week', function (req, res) {
+router.get('/last-week/:facebook_id?', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-	 	LastWeek.findOne({spotify_id: req.session.spotifyId}, function (err, playlist) {
-			res.render('last_week', {playlist: playlist});
-		}); 		
+		if (!req.params.facebook_id) {
+			LastWeek.findOne({spotify_id: req.session.spotifyId}, function (err, playlist) {
+				res.render('last_week', {playlist: playlist, username: 'Your'});
+			}); 	
+		} else {
+			User.findOne({facebook_id: req.params.facebook_id}, function (err, user){
+				if (!user) {
+					FB_User.findOne({facebook_id: req.params.facebook_id}, function (err, fb_user) {
+						if (!fb_user) { 
+							res.redirect('/not-found');
+						} else { 
+							res.redirect('/user-incomplete');
+						}
+					}); 
+				} else {
+					LastWeek.findOne({spotify_id: user.spotify_id}, function (err, playlist) {
+						res.render('last_week', {playlist: playlist, username: user.name.split(' ')[0]+"'s"});
+					}); 	
+				}
+			});
+		}
 	}
 }); 
 
