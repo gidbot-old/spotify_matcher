@@ -12,6 +12,7 @@ var spotify = 'spotify';
 // Models 
 var User = require('../models/user');
 var FB_User = require('../models/fb_user');
+var Match = require('../models/match');
 var LastWeek = require('../models/last_week');
 
 
@@ -85,18 +86,14 @@ router.get('/home', function (req, res){
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		FB.api('me/friends', 'get', {access_token: req.session.facebookToken, limit: 100},  function (fb_response) {
-		  if(!fb_response || fb_response.error) {
-		  		res.redirect('/logout');
-			} else {
-		  		res.render('home', 
-		  			{
-		  				users: fb_response.data,
-						currentDisplayName: req.session.name,
-						currentFacebookId: req.session.facebookId
-		  			});
-		  	}
-		});
+		Match.findOne({facebook_id: req.session.facebookId}, function (err, result) {
+			res.render('home', 
+  			{
+  				users: result.matches,
+				currentDisplayName: req.session.name,
+				currentFacebookId: req.session.facebookId
+  			});
+		});   	
 	}
 }); 
 
