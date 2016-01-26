@@ -56,32 +56,27 @@
 
 <script>
  
-$(function() {
 
-	$('.facebook-login-btn').click(function (){
-		
-		FB.login(function(response) {
-			if (response.authResponse) {
-			     $.post( "/facebook-login", response)
-				 .done(function (data) {
-				 	if (data.spotify){
-				 		window.location.replace("/login");
-				 	} else {
-				 		window.location.replace("/auth/spotify");
-				 	}
-				 })
-				 .fail(function (data){
-					console.log('Failure')
-				 });
-		    } else {
-		     	alert('Please Authorize the Discover-Weekly');
-		    }
+var fbLogin = function () {
+	FB.login(function(response) {
+		if (response.authResponse) {
+		     $.post( "/facebook-login", response)
+			 .done(function (data) {
+			 	if (data.spotify){
+			 		window.location.replace("/login");
+			 	} else {
+			 		window.location.replace("/auth/spotify");
+			 	}
+			 })
+			 .fail(function (data){
+				console.log('Failure')
+			 });
+	    } else {
+	     	alert('Please Authorize the Discover-Weekly');
+	    }
 
-		}, {scope: 'user_friends'});
-
-	});
-	
-});
+	}, {scope: 'user_friends'});
+}	
 
 </script>
 
@@ -101,7 +96,7 @@ $(function() {
 	<div class = "col-xs-12 buttons">
 		<% if (!facebook || !spotify) { %>
 			<% if (!facebook) { %>
-				<a href='#' class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
+				<a href="#" onclick="fbLogin()" class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
 			<% } else { %>
 				<a href='/auth/spotify' class="btn btn-lg btn-success" role="button"> Add Spotify </a>
 			<% } %> 
