@@ -131,7 +131,7 @@ router.get('/auth/spotify', function (req, res) {
 
 router.get('/auth/spotify/callback', function (req, res){
 	if (!req.session.facebookId || (req.session.facebookId && req.session.spotifyId)) {
-		res.direct('/login');
+		res.redirect('/login');
 	}  else  {
 		var code = req.query.code; 
 		spotifyApi.authorizationCodeGrant(code)
@@ -247,15 +247,14 @@ router.get('/user/:facebook_id', function (req, res) {
 					}
 				}); 
 			} else {
-				FB.api(req.params.facebook_id+'/friends', 'get', {access_token: req.session.facebookToken, limit: 100},  function (fb_response) {
+				Match.findOne({facebook_id: req.params.facebook_id}, function (err, result) {
 					res.render('user', {
 						otherDwId: user.dw_spotify_id,
 						otherDisplayName: (user.name)? user.name: user.spotify_id,
 						otherFacebookId: user.facebook_id, 
-						users: fb_response.data
-					});						  
-				  		
-				});
+						users: result.matches
+					});
+				});  
 			}
 		});
 	}
@@ -490,7 +489,7 @@ var discoverUsers = function(fbIds, currentId, callback) {
 			facebook_id:{'$in':fbIds}, 
 			spotify_id: {"$ne": currentUser.spotify_id}
 		}
-		User.find(findJson).exec(function (err, users) {
+		User.find(findJson, function (err, users) {
 			users.forEach(function (user2) {
 			    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
 			    if (tracksInCommon.length >= tracksMax) {
@@ -506,6 +505,71 @@ var discoverUsers = function(fbIds, currentId, callback) {
 		});
 	});
 
+};
+
+
+
+//Matches
+router.post('/get-matches', function (req, res) { 
+	if (!req.session.facebookId || !req.session.spotifyId) {
+		res.redirect('/login');
+	} else {
+		console.log('test1');
+		discoverMatches(req.session.spotifyId, function (connections){
+			var options = {
+				upsert: true
+			}
+			var setJson = {
+				facebook_id: req.session.facebookId, 
+				spotify_id: req.session.spotifyId, 
+				matches: connections
+			}
+
+			var new_match = new Match(setJson); 
+			new_match.save(function (err) {
+				console.log('done');
+				if (err) {
+					res.status(500).send('Server Error');
+				} else {
+					res.status(200).send('Matches Added');
+				}
+			}); 
+		});
+		
+	}
+}); 
+
+var discoverMatches = function(currentId, callback) {
+	var matches = []; 
+	User.findOne({spotify_id: currentId}, function(err, currentUser) {
+		if (err) { 
+			console.log(err);
+		}
+		var findJson = {
+			spotify_id: {"$ne": currentUser.spotify_id}
+		}
+		User.find(findJson, function (err, users) {
+			if (err) {
+				console.log(err);
+			}
+			users.forEach(function (user2) {			
+			    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
+		    	var artistsInCommon = getIntersection(currentUser.sorted_artists, user2.sorted_artists);
+		    	var total = artistsInCommon.length + tracksInCommon.length;
+		    	if (total > 1) {
+		    		if (user2.facebook_id) { 
+		    			var match = {
+		    				facebook_id: user2.facebook_id,
+		    				total: total, 
+		    				name: (user2.name.length > 0) ? user2.name: user2.spotify_id
+		    			}
+		    			matches.push(match);
+		    		}
+			    }   
+		  	});
+		  	callback(matches);
+		});
+	});
 };
 
 module.exports = router;

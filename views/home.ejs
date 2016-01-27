@@ -7,8 +7,9 @@
 	users = [];
 } else {
 	users.sort(function(a, b) {
-	    return a.total < b.total;
+	    return b.total - a.total;
 	});
+
 } %>
 <head>
 	<script type="text/javascript" src= "/js/spotify.js"></script>
@@ -58,7 +59,6 @@
     	overflow: hidden;
 	    text-overflow: ellipsis;
 	    color: black;
-
 	}
 	.friends-container {
 		margin-top: 50px;
@@ -109,13 +109,16 @@
 				</h3>
 			</div>
 		<% } else { %> 
-			<h3 class='friends-heading col-sm-2 col-xs-3'>
-				Matches:
+			<h3 class='friends-heading col-xs-3'>
+				Top Matches:
 			</h3>
 			<div class = 'col-xs-12'></div>
 			<%
 			for (var i = 0; i < users.length; i++) {
 				var id = users[i].facebook_id; 
+				var name = users[i].name.split(' ');
+				var first_name = (name[1]) ? name[0] : "user"
+				var last_name = (name[1]) ? name[1] : name[0];
 			%> 
 			<% if (i%6==0) {  %> 
 					<div class='row'> 
@@ -123,10 +126,10 @@
 
 			<a href='/user/<%- id %>'>
 				<div class = "col-sm-2 col-xs-4 profile-container">
-					<div class="friend-user-name"><%- users[i].name%></div>
+					<div class="friend-user-name"><%- first_name %><br><%- last_name %></div>
 					<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(https://graph.facebook.com/<%- id %>/picture?type=large);'>
 					<div class='percentage'>
-						<%- (users[i].total/60*100).toFixed(2); %>% in Common
+						<%- (users[i].total/60*100).toFixed(2); %>% 
 					</div>
 				</div>
 			</a>

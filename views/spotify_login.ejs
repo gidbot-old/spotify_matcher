@@ -100,8 +100,16 @@ $(function() {
 		}
 		$.post( "/spotify-login", user)
 		  .done(function (data) {
-		    statusBar.style.width = "100%";
-			window.location.replace("/login");
+		    statusBar.style.width = "90%";
+		    
+		    $.post( "/get-matches")
+			  .done(function (data) {
+			    statusBar.style.width = "100%";
+				window.location.replace("/login");
+			}).fail(function (data){
+				console.log('Failure')
+			}) ;
+
 		}).fail(function (data){
 			console.log('Failure')
 		}) ;
