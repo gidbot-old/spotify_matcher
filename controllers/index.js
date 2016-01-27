@@ -89,7 +89,7 @@ router.get('/home', function (req, res){
 		Match.findOne({facebook_id: req.session.facebookId}, function (err, result) {
 			res.render('home', 
   			{
-  				users: result.matches,
+  				users: (result) ? result.matches : null,
 				currentDisplayName: req.session.name,
 				currentFacebookId: req.session.facebookId
   			});
@@ -254,7 +254,7 @@ router.get('/user/:facebook_id', function (req, res) {
 						otherFacebookId: user.facebook_id, 
 						currentFacebookId: req.session.facebookId, 
 						otherSpotifyId: user.spotify_id, 
-						users: result.matches
+						users: (result) ? result.matches: null
 					});
 				});  
 			}
