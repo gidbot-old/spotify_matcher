@@ -6,9 +6,9 @@
 <% if (!users) {
 	users = [];
 } else {
-	users.sort(function(a, b) {
+	users = users.sort(function(a, b) {
 	    return b.total - a.total;
-	});
+	}).slice(0,12);
 } %>
 <head>
 	<script type="text/javascript" src= "/js/spotify.js"></script>
