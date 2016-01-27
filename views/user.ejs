@@ -84,7 +84,7 @@
 		</h3>
 
 		<div class="action-btns">
-			<a href='/compare/<%- otherFacebookId %>' class='action' role="button"> Compare</a>
+			<a href='/compare/<%- currentFacebookId %>/<%- otherFacebookId %>' class='action' role="button"> Compare</a>
 			|
 			<a href='/last-week/<%- otherFacebookId %>' class='action' role="button"> Last Week</a>
 		</div>
@@ -112,7 +112,7 @@
 						<div class='row'> 
 				<%  } %> 
 
-				<a href='/user/<%- id %>'>
+				<a href='/compare/<%- otherFacebookId %>/<%- id %>'>
 					<div class = "col-sm-2 col-xs-4 profile-container">
 						<div class="friend-user-name"><%- first_name %><br><%- last_name %></div>
 						<img class="friend-profile img-responsive" src="/img/hollow_circle.png" style='background-image:url(https://graph.facebook.com/<%- id %>/picture?type=large);'>

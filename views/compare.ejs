@@ -9,6 +9,24 @@ $(function() {
 	vsHeight = (vsHeight < 10) ? 10: vsHeight;
 	$('.vs-container').css('margin-top', vsHeight+"px");
 
+	$('.facebook-compare-share').click(function (){
+		FB.ui({
+		  method: 'share',
+		  href: window.location.href,
+		}, function(response){});
+	});
+
+	$('.facebook-compare-message').click(function(){
+    	FB.ui({
+		  method: 'send',
+		  link: window.location.href
+		});
+    });
+
+	 var text = 'Checkout this Discoer-Weekly Match: ' + window.location.href;
+     var tweet = 'https://twitter.com/intent/tweet?text=' + text;
+     $("a[href^='https://twitter.com/intent/tweet']").attr("href", tweet);
+
 });
 </script>
 
@@ -68,6 +86,7 @@ $(function() {
 	.discover-text{
 		text-align: center;
 	}
+	
 
 </style>
 
@@ -79,11 +98,21 @@ $(function() {
 
 	<div class='random'>
 		<a href='/random' class='action'> Random</a>
+		|
+		<a class='action' href='https://twitter.com/intent/tweet?text='>Tweet</a> 
+		| 
+		<a class='action facebook-compare-share'>Share</a> 
+		| 
+		<a class='action facebook-compare-message'>Message</a>
 	</div>
 
-	<div class = "col-md-4 profile-container">
-		<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- currentFacebookId %>/picture?type=large)'>
+	
 
+
+	<div class = "col-md-4 profile-container">
+		<a href='/user/<%- currentFacebookId %>'>
+			<img src="/img/hollow_circle.png" class="profile-pic" style='background-image:url(http://graph.facebook.com/<%- currentFacebookId %>/picture?type=large)'>
+		</a>
 		<h3 class="user-name">
 			<%- currentDisplayName %>'s
 			<br>
@@ -98,11 +127,31 @@ $(function() {
 	<div class = "col-md-4 vs-container">
 		
 		<b style="font-size: 20px;"> Match: <%= percent %>%  </b> 
+		
+		<br> <br>
+		<b> Tracks in Common: </b> 
+		<br>
+		<span id='common-tracks'>
+			<% var keys = Object.keys(tracks); 
+			var overlap = [];
+			if (keys.length < 1) { %> 
+				None
+			<% } else {
+				for (var i = 0; i<keys.length; i++) { 
+					overlap.push(tracks[keys[i]].artist_id); 
+					%> 
+			<a target="_blank" href="https://open.spotify.com/track/<%-keys[i]%>"><%- tracks[keys[i]].name %> </a>  by <a target="_blank" href="https://open.spotify.com/artist/<%-tracks[keys[i]].artist_id%>"> <%- artists[tracks[keys[i]].artist_id]%></a> 
+			<% if (i < keys.length-1) {%><br><% }%> 
+			<% } } %>
+		</span>
+
 		<br> <br>   
-		<b> Artists in Common: </b> 
+		<b> Other Artists in Common: </b> 
 		<br> 
 		<span id='common-artists'>
-			<% var keys = Object.keys(artists); 
+			<% var keys = Object.keys(artists).filter(function(val) {
+  				return overlap.indexOf(val) == -1;
+			}); 
 			if (keys.length < 1) { %> 
 				None
 			<% } else {
@@ -110,19 +159,6 @@ $(function() {
 				<a target="_blank" href="https://open.spotify.com/artist/<%-keys[i]%>"><%- artists[keys[i]];%></a><% if (i < keys.length-1) {%>, <% }%> 
 			<% } } %>
 		</span>
-		<br> <br>
-		<b> Tracks in Common: </b> 
-		<br>
-		<span id='common-tracks'>
-			<% var keys = Object.keys(tracks); 
-			if (keys.length < 1) { %> 
-				None
-			<% } else {
-				for (var i = 0; i<keys.length; i++) { %> 
-			<a target="_blank" href="https://open.spotify.com/track/<%-keys[i]%>"><%- tracks[keys[i]].name;%></a><% if (i < keys.length-1) {%>, <% }%> 
-			<% } } %>
-		</span>
-
 	</div>
 
 	<div class = "col-md-4 profile-container">

@@ -252,6 +252,8 @@ router.get('/user/:facebook_id', function (req, res) {
 						otherDwId: user.dw_spotify_id,
 						otherDisplayName: (user.name)? user.name: user.spotify_id,
 						otherFacebookId: user.facebook_id, 
+						currentFacebookId: req.session.facebookId, 
+						otherSpotifyId: user.spotify_id, 
 						users: result.matches
 					});
 				});  
@@ -260,22 +262,17 @@ router.get('/user/:facebook_id', function (req, res) {
 	}
 });
 
-router.get('/compare/:facebook_id', function (req, res) {
-	if (!req.session.facebookId || !req.session.spotifyId) {
-		res.redirect('/login'); 
-	} else {
-		try {
-			User.findOne({facebook_id: req.params.facebook_id}, function (err, user){
-				if (!user) {
-					FB_User.findOne({facebook_id: req.params.facebook_id}, function (err, fb_user) {
-						if (!fb_user) { 
-							res.redirect('/not-found');
-						} else { 
-							res.redirect('/user-incomplete');
-						}
-					}); 
-				} else {
-					User.findOne({facebook_id: req.session.facebookId}, function (err, user2){
+router.get('/compare/:facebook_id/:second_id', function (req, res) {
+	try {
+		User.findOne({facebook_id: req.params.second_id}, function (err, user2){
+			if (!user2) {
+				res.redirect('/not-found');
+			} else {
+				
+				User.findOne({facebook_id: req.params.facebook_id}, function (err, user){
+					if (!user) {
+						res.redirect('/not-found');
+					} else {
 						var artistsInCommon = getIntersection(user.sorted_artists, user2.sorted_artists);
 						var tracksInCommon = getIntersection(user.sorted_tracks, user2.sorted_tracks);
 						var artists = {};
@@ -291,21 +288,21 @@ router.get('/compare/:facebook_id', function (req, res) {
 							percent: percent,  
 							tracks: tracks, 
 							artists: artists, 
-							currentDwId: user2.dw_spotify_id,
-							otherDwId: user.dw_spotify_id,
-							currentDisplayName: (user2.name)? user2.name: user2.spotify_id,
-							otherDisplayName: (user.name)? user.name: user.spotify_id,
-							currentFacebookId: user2.facebook_id,
-							otherFacebookId: user.facebook_id
+							currentDwId: user.dw_spotify_id,
+							otherDwId: user2.dw_spotify_id,
+							currentDisplayName: (user.name)? user.name: user.spotify_id,
+							otherDisplayName: (user2.name)? user2.name: user2.spotify_id,
+							currentFacebookId: user.facebook_id,
+							otherFacebookId: user2.facebook_id
 						});
-
-					});
-				}
-			});
-		} catch (e){
-			res.redirect('/not-found');
-		}
+					}
+				});
+			}
+		});
+	} catch (e){
+		res.redirect('/not-found');
 	}
+
 
 }); 
 
@@ -379,7 +376,7 @@ function searchUsers (search, page, callback) {
 			name: {$regex:search,  $options: 'i'},
 			facebook_id:{$exists:true}
 		},
-		{facebook_id:1, name:1},
+		{facebook_id:1, name:1, spotify_id:1 },
 		{limit: 10, offset:page}, function (err, users){
 		callback(users);
 	});
@@ -439,21 +436,15 @@ router.get('/last-week/:facebook_id?', function (req, res) {
 		res.redirect('/login');
 	} else {
 		if (!req.params.facebook_id) {
-			LastWeek.findOne({spotify_id: req.session.spotifyId}, function (err, playlist) {
+			LastWeek.findOne({facebook_id: req.session.facebookId}, function (err, playlist) {
 				res.render('last_week', {playlist: playlist, username: 'Your'});
 			}); 	
 		} else {
 			User.findOne({facebook_id: req.params.facebook_id}, function (err, user){
 				if (!user) {
-					FB_User.findOne({facebook_id: req.params.facebook_id}, function (err, fb_user) {
-						if (!fb_user) { 
-							res.redirect('/not-found');
-						} else { 
-							res.redirect('/user-incomplete');
-						}
-					}); 
+					res.redirect('/not-found');	
 				} else {
-					LastWeek.findOne({spotify_id: user.spotify_id}, function (err, playlist) {
+					LastWeek.findOne({facebook_id: user.facebook_id}, function (err, playlist) {
 						res.render('last_week', {playlist: playlist, username: user.name.split(' ')[0]+"'s"});
 					}); 	
 				}
@@ -514,7 +505,6 @@ router.post('/get-matches', function (req, res) {
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
 	} else {
-		console.log('test1');
 		discoverMatches(req.session.spotifyId, function (connections){
 			var options = {
 				upsert: true
@@ -527,7 +517,6 @@ router.post('/get-matches', function (req, res) {
 
 			var new_match = new Match(setJson); 
 			new_match.save(function (err) {
-				console.log('done');
 				if (err) {
 					res.status(500).send('Server Error');
 				} else {
@@ -560,6 +549,7 @@ var discoverMatches = function(currentId, callback) {
 		    		if (user2.facebook_id) { 
 		    			var match = {
 		    				facebook_id: user2.facebook_id,
+		    				spotify_id: user2.spotify_id,
 		    				total: total, 
 		    				name: (user2.name.length > 0) ? user2.name: user2.spotify_id
 		    			}
