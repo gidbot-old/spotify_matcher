@@ -3,8 +3,7 @@
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<meta property="og:url" content="https://www.discover-weekly.com/" />
-	<meta property="og:title" content="Discover Weekly Comparison" />
+	<meta property="og:title" content="Discover Weekly" />
 	<meta property="og:description" content="Check out the similarities between these 2 playlists" />
 	
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -22,8 +21,8 @@ mixpanel.init("65e3524107236f7d0456fcd80cb69f5c");</script><!-- end Mixpanel -->
 	<script type="text/javascript">
 		window.fbAsyncInit = function() {
 			FB.init({
-				appId      : '1504441939859902',
-				// appId      : '1505548576415905',
+				// appId      : '1504441939859902',
+				appId      : '1505548576415905',
 				cookie: true,
 				version    : 'v2.5'
 			});
@@ -70,7 +69,7 @@ $(function() {
 		});
     });
 
-	 var text = 'Checkout this Discoer-Weekly Match: ' + window.location.href;
+	 var text = 'Checkout this Discover-Weekly Match: ' + window.location.href;
      var tweet = 'https://twitter.com/intent/tweet?text=' + text;
      $("a[href^='https://twitter.com/intent/tweet']").attr("href", tweet);
 
@@ -145,8 +144,7 @@ $(function() {
 
 
 	<div class='random'>
-		<a href='/random' class='action'> Random</a>
-		|
+		<h4> Share this matchup </h4>
 		<a class='action' href='https://twitter.com/intent/tweet?text='>Tweet</a> 
 		| 
 		<a class='action facebook-compare-share'>Share</a> 

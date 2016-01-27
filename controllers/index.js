@@ -341,7 +341,7 @@ router.get('/random', function (req, res) {
 		  		res.render('add_friends');
 		  	} else { 
 		  		var index = Math.floor((Math.random() * (fb_response.data.length-1)));
-		  		res.redirect(302, '/compare/'+ fb_response.data[index].id);
+		  		res.redirect(302, '/compare/' + req.session.facebookId +'/'+ fb_response.data[index].id);
 		  	}
 		  }
 		});
