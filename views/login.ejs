@@ -48,7 +48,9 @@
 		background-color: #324b81;
 		border-color: #324b81;
 	}
-	
+	.new-user-notice {
+		margin-top: 25px;
+	}
 
 </style>
 
@@ -97,6 +99,11 @@ var fbLogin = function () {
 		<% if (!facebook || !spotify) { %>
 			<% if (!facebook) { %>
 				<a href="#" onclick="fbLogin()" class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
+
+				<div class='new-user-notice col-xs-8 col-xs-offset-2'>
+					<b> IMPORTANT: New Users, if you follow any other Discover Weeklies, before signing up please find your own playlist, unfollow it and then follow it again. Otherwise you'll end up with someone else's playlist! </b>
+				</div>
+
 			<% } else { %>
 				<a href='/auth/spotify' class="btn btn-lg btn-success" role="button"> Add Spotify </a>
 			<% } %> 
