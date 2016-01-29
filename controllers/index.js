@@ -436,7 +436,7 @@ router.get('/last-week/:facebook_id?', function (req, res) {
 		res.redirect('/login');
 	} else {
 		if (!req.params.facebook_id) {
-			LastWeek.findOne({facebook_id: req.session.facebookId}, function (err, playlist) {
+			LastWeek.findOne({spotify_id: req.session.spotifyId}, function (err, playlist) {
 				res.render('last_week', {playlist: playlist, username: 'Your'});
 			}); 	
 		} else {
@@ -444,7 +444,7 @@ router.get('/last-week/:facebook_id?', function (req, res) {
 				if (!user) {
 					res.redirect('/not-found');	
 				} else {
-					LastWeek.findOne({facebook_id: user.facebook_id}, function (err, playlist) {
+					LastWeek.findOne({spotify_id: user.spotify_id}, function (err, playlist) {
 						res.render('last_week', {playlist: playlist, username: user.name.split(' ')[0]+"'s"});
 					}); 	
 				}
