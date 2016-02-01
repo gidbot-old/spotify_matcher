@@ -8,7 +8,8 @@ var express = require('express')
 , session = require('express-session')
 , favicon = require('serve-favicon')
 , mongoose = require('mongoose')
-, config = require('./config');
+, redisStore = require('connect-redis')(session)
+, config = require('./config'); 
 
 var rejectedUrls = [
   'discover-weekly.herokuapp.com',
