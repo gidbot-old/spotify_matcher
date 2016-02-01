@@ -28,14 +28,31 @@ mongoose.connect(config.mongo_url);
 
 app.use(favicon(path.join(__dirname,'public','img','favicon.ico')));
 
-app.use(session({ 
-	secret: 'keyboard_cat', 
-	cookie: {
-	maxAge  : new Date(Date.now() + 3600000*24), // 24 Hours
-	expires : new Date(Date.now() + 3600000*24)
-}, 
-resave: true, 
-saveUninitialized: true })); 
+
+  var redis_url = config.redis_url;
+  var store = new redisStore({ url: redis_url });
+
+  app.use(cookieParser('yourothersecretcode'));
+
+  app.use(session(
+  {
+    secret: 'yourothersecretcode', 
+    store: store,
+    saveUninitialized: true,  // don't create session until something stored,
+    resave: true, 
+    maxAge  : new Date(Date.now() + 3600000*24), // 24 Hours
+    expires : new Date(Date.now() + 3600000*24)
+  }
+));
+
+// app.use(session({ 
+// 	secret: 'keyboard_cat', 
+// 	cookie: {
+// 	maxAge  : new Date(Date.now() + 3600000*24), // 24 Hours
+// 	expires : new Date(Date.now() + 3600000*24)
+// }, 
+// resave: true, 
+// saveUninitialized: true })); 
 
 
 app.set('views', __dirname + '/views')

@@ -14,6 +14,7 @@ var User = require('../models/user');
 var FB_User = require('../models/fb_user');
 var Match = require('../models/match');
 var LastWeek = require('../models/last_week');
+var TopList = require('../models/top_list');
 
 
 var scopes = ['playlist-read-private', 'user-read-email'],
@@ -498,9 +499,16 @@ var discoverUsers = function(fbIds, currentId, callback) {
 
 };
 
+// Top Tracks
+router.get('/top-tracks', function (req, res) {
+	TopList.findOne({}, {}, { sort: { 'date_added' : -1 } }, function(err, list) {
+  		res.render('top_list', {
+  			tracks: list.tracks 
+  		}); 
+	});
+}); 
 
-
-//Matches
+// Matches
 router.post('/get-matches', function (req, res) { 
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');

@@ -98,8 +98,9 @@ var fbLogin = function () {
 	<div class = "col-xs-12 buttons">
 		<% if (!facebook || !spotify) { %>
 			<% if (!facebook) { %>
-				<a href="#" onclick="fbLogin()" class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
-
+				<div class='col-xs-12'> 
+					<a href="#" onclick="fbLogin()" class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
+				</div>
 				<div class='new-user-notice col-xs-8 col-xs-offset-2'>
 					<b> IMPORTANT: New Users, if you follow any other Discover Weeklies, before signing up please find your own playlist, unfollow it and then follow it again. Otherwise you'll end up with someone else's playlist! </b>
 				</div>
