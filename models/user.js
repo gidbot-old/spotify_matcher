@@ -12,8 +12,18 @@ var userSchema = new Schema({
   sorted_artists: Array,
   profile_pic : String,
   facebook_id : String,
-  name : String
+  name : String,
+  created_at : Date
+
 }, { collection: 'users' });
+
+userSchema.pre('save', function(next){
+  if ( !this.created_at ) {
+    this.created_at = new Date();
+  }
+  next();
+});
+
 
 var User = mongoose.model('User', userSchema);
 
