@@ -32,19 +32,6 @@ var scopes = ['playlist-read-private', 'user-read-email'],
       }
 	});
 
-function previousSpotify (token, callback) {
-	spotifyApi.setAccessToken(token); 
-	spotifyApi.getMe()
-	  .then(function(data) {
-	  	User.findOne({spotify_id: data.body.id}, function (err, result) {
-	    		callback(result);
-	    	}); 
-	  }, function(err) {
-	  		callback(false);
-	  });
-}
-
-
 function idExists (fb_id, service, callback) {
 	User.findOne({facebook_id: fb_id}, function (err, result) {
 		if (err) throw err;
@@ -106,11 +93,16 @@ router.get('/logout', function (req, res) {
 	res.redirect('/login');
 }); 
 
-router.get('/', function (req, res) {  
-	res.render('login', {
+router.get('/', function (req, res) { 
+	var status = {
 		facebook: (!req.session.facebookId) ? false: true, 
 		spotify: (!req.session.spotifyId) ? false: true
-	});
+	}
+	if (status.facebook && status.spotify) {
+		res.redirect('/home');
+	} else {
+		res.render('login', status);
+	}
 }); 
 
 router.get('/login', function (req, res) {  
@@ -140,21 +132,9 @@ router.get('/auth/spotify/callback', function (req, res){
 			req.session.spotifyToken = data.body['access_token'];
 			spotifyApi.setAccessToken(data.body['access_token']);
     		spotifyApi.setRefreshToken(data.body['refresh_token']);
-			
-			previousSpotify(data.body['access_token'], function (result) {
-				if (!result) {
-					res.redirect(302, '/spotify-login'); 
-				} else {
-					FB_User.remove({facebook_id: req.session.facebookId}, function (err) {
-						User.update({spotify_id: result.spotify_id}, {$set:{facebook_id:req.session.facebookId}}, function (err, response) {
-								req.session.spotifyId = result.spotify_id; 
-								req.session.name = result.name;
-								res.redirect(302, '/login'); 
-						});
-					}); 
-				}
-			}); 
 
+			res.redirect('/select-playlist');
+				
 		}, function (err) {
 			res.redirect('/login');
 		});
@@ -198,6 +178,51 @@ router.post('/facebook-login', function (req, res) {
 			}
 		}); 
 
+	}
+});
+
+router.get('/select-playlist', function (req, res) {
+	if(!req.session.spotifyToken) {
+		res.redirect('/login');
+	} else {
+		spotifyApi.getMe()
+		.then(function (data) {
+		 	return data.body.id;
+		})
+		.then(function (user_id) {
+			return spotifyApi.getUserPlaylists(user_id, {limit:50});
+		})
+		.then(function (data) {
+			var items = data.body.items; 
+			var possible_playlists = []; 
+		    for (var i = 0; i < items.length; i++) {
+		    	if (items[i].owner.id == 'spotifydiscover') {
+		    		var playlist = {
+		    			id: items[i].id, 
+		    			name: items[i].name,
+		    			image: items[i].images[0].url
+		    		}
+		    		possible_playlists.push(playlist); 	    		
+		    	}
+		    }
+		    if (possible_playlists.length < 1) {
+		    	res.redirect('/no-playlists');
+		    } else {
+		    	res.render('select_playlist', {playlists: possible_playlists}); 		    	
+		    }
+		});
+	}
+});
+
+router.get('/no-playlists', function (req, res) {
+	res.render('no_playlists');
+}); 
+
+router.get('/select-playlist/:id', function (req, res) {
+	if(!req.session.spotifyToken) {
+		res.redirect('/login');
+	} else {
+		res.render('spotify_login', {token: req.session.spotifyToken, id: req.params.id}); 
 	}
 });
 

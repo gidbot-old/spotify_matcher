@@ -65,7 +65,7 @@ var fbLogin = function () {
 		     $.post( "/facebook-login", response)
 			 .done(function (data) {
 			 	if (data.spotify){
-			 		window.location.replace("/login");
+			 		window.location.replace("/");
 			 	} else {
 			 		window.location.replace("/auth/spotify");
 			 	}
@@ -101,10 +101,6 @@ var fbLogin = function () {
 				<div class='col-xs-12'> 
 					<a href="#" onclick="fbLogin()" class="facebook-login-btn btn btn-lg btn-info" role="button"> Log in with Facebook </a>
 				</div>
-				<div class='new-user-notice col-xs-8 col-xs-offset-2'>
-					<b> IMPORTANT: New Users, if you follow any other Discover Weeklies, before signing up please find your own playlist, unfollow it and then follow it again. Otherwise you'll end up with someone else's playlist! </b>
-				</div>
-
 			<% } else { %>
 				<a href='/auth/spotify' class="btn btn-lg btn-success" role="button"> Add Spotify </a>
 			<% } %> 

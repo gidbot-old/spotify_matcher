@@ -39,11 +39,11 @@ $(function() {
 
 	var userDetails;
 	var id; 
-	var dw_id; 
+	var dw_id = '<%- id %>'; 
 	var tracks = {};
 	var artists = {}; 
 	var statusBar = document.getElementById("progress-bar"); 
-	statusBar.style.width = "5%"; 
+	statusBar.style.width = "10%"; 
 
 	spotifyApi.getMe().then(function (data) {
 		id = data.id;
@@ -53,25 +53,11 @@ $(function() {
 			email: data.email,
 			profile_pic: img_url
 		}
-		statusBar.style.width = "15%";
-		return id;
-	})
-	.then(function (user_id) {
 		statusBar.style.width = "25%";
-		return spotifyApi.getUserPlaylists(user_id, {limit:50});
-	})
-	.then(function (data) {
-		statusBar.style.width = "40%";
-		var items = data.items; 
-	    for (var i = 0; i < items.length; i++) {
-	    	if (items[i].owner.id == 'spotifydiscover') { 
-	    		dw_id = items[i].id; 
-	    		return items[i].id; 
-	    	}
-	    }
+		return dw_id;
 	})
 	.then(function (playlist_id) {
-		statusBar.style.width = "60%";
+		statusBar.style.width = "50%";
 		return spotifyApi.getPlaylistTracks('spotifydiscover', playlist_id);
 	})
 	.then(function (data) {
