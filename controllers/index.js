@@ -542,10 +542,13 @@ router.post('/get-matches', function (req, res) {
 			var options = {
 				upsert: true
 			}
+			connections.sort(function(a, b) {
+			    return b.total - a.total;
+			});
 			var setJson = {
 				facebook_id: req.session.facebookId, 
 				spotify_id: req.session.spotifyId, 
-				matches: connections
+				matches: connections.slice(0, 12)
 			}
 
 			var new_match = new Match(setJson); 
