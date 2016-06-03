@@ -70,6 +70,14 @@ function getIntersection (array1, array2) {
 	return inCommon;
 }
 
+router.get('/gmail-manifest', function (res, res) {
+	res.sendFile('./views/manifest.xml');
+}); 
+
+router.get('/gmail-gadget', function (res, res) {
+	res.sendFile('./views/gadget.xml');
+}); 
+
 router.get('/home', function (req, res){
 	if (!req.session.facebookId || !req.session.spotifyId) {
 		res.redirect('/login');
