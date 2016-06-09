@@ -17,7 +17,7 @@ var LastWeek = require('../models/last_week');
 var TopList = require('../models/top_list');
 
 
-var scopes = ['playlist-read-private', 'user-read-email'],
+var scopes = ['playlist-read-private', 'user-read-email', 'playlist-modify-public'],
     redirectUri = config.spotify_redirect,
     clientId = 'a9b262c869aa4a9391f78deb6bc5af3d',
     clientSecret = '449989ef56f041ce98079391c1952bd2',
@@ -249,6 +249,7 @@ router.post('/spotify-login', function (req, res) {
 		res.status(401).send('Log in to Spotify First');
 	} else {
 		var new_user = new User(req.body);
+		new_user.spotify_refresh_token = spotifyApi.getRefreshToken();
 		new_user.facebook_id = req.session.facebookId; 
 		new_user.save(function (err, result) {
 			if (err) {

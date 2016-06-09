@@ -13,6 +13,7 @@ var userSchema = new Schema({
   profile_pic : String,
   facebook_id : String,
   name : String,
+  spotify_refresh_token: String,
   created_at : Date
 
 }, { collection: 'users' });
