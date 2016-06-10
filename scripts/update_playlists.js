@@ -15,9 +15,8 @@ var spotifyApi = new SpotifyWebApi({
 
 var User = require('../models/user');
 var LastWeek = require('../models/last_week');
-mongoose.connect(config.mongo_url);
 
-var runUpdate = function (limit, offset) {
+var updateBatch = function (limit, offset) {
 	User.find().limit(limit).skip(offset).exec(function (err, users) {
 		var num = users.length;
 		for (var i = 0; i < users.length; i++) {
@@ -27,9 +26,10 @@ var runUpdate = function (limit, offset) {
 					if (num < 1) {
 						console.log('Playlist Batch Updated'); 
 						if (users.length >= limit) {
-							runUpdate(limit, users.length);
+							updateBatch(limit, users.length);
 						} else {
-							mongoose.connection.close()
+							mongoose.connection.close();
+							console.log("All Playlists Have Been Updated");
 						}
 					} 
 				});
@@ -38,18 +38,20 @@ var runUpdate = function (limit, offset) {
 	})
 }
 
-User.findOne({name: "Gideon Rosenthal"}, function (err, user) {		
-	spotifyApi.setRefreshToken(user.spotify_refresh_token);
-	spotifyApi.refreshAccessToken()
-		.then(function (data) {
-			console.log("Spotify Token Updated");
-			spotifyApi.setAccessToken(data.body['access_token']);
-			runUpdate(2, 0); 
+var runUpdate = function () {
+	User.findOne({name: "Gideon Rosenthal"}, function (err, user) {		
+		spotifyApi.setRefreshToken(user.spotify_refresh_token);
+		spotifyApi.refreshAccessToken()
+			.then(function (data) {
+				console.log("Spotify Token Updated");
+				spotifyApi.setAccessToken(data.body['access_token']);
+				updateBatch(50, 0); 
 
-		}, function (err) {
-	    	console.log('Could not refresh access token', err);
+			}, function (err) {
+		    	console.log('Could not refresh access token', err);
+		});
 	});
-});
+}
 
 
 function saveLastWeek (user, callback) {
@@ -101,5 +103,15 @@ function updatePlaylist (spotify_id, playlist_id, callback) {
 		console.log("Error W/ Spotify API");
 		console.log(err);
 	});
+}
+
+
+var d = new Date();
+var n = d.getDay();
+if (n == 4) {
+	mongoose.connect(config.mongo_url);
+	runUpdate();
+} else {
+	console.log("Not Monday");
 }
 
