@@ -105,6 +105,4 @@ var run = function () {
 	
 }; 
 
-run();
-
 exports.run = run;
