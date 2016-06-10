@@ -1,8 +1,12 @@
-var MongoClient = require('mongodb').MongoClient;
-var mongoUrl = "mongodb://gidbot:ttfbtb2404@candidate.37.mongolayer.com:11137,candidate.52.mongolayer.com:10829/spotify?replicaSet=set-5689c22023371e1d340008f6";
-// var User = require('./website/models/user');
-// var mongoose = require('mongoose');
+var MongoClient = require('mongodb').MongoClient
+, config = require('../config') 
+, mongoUrl = config.mongo_url
+, mongoose = require('mongoose')
+, calculateTopSongs = require('./calculate_top_songs');
 
+var User = require('../models/user');
+var LastWeek = require('../models/last_week');
+var Match = require('../models/match');
 
 function getIntersection (array1, array2) {
 	var inCommon = [];	
@@ -30,79 +34,70 @@ var discoverUsers = function(currentId, callback) {
 	var matches = []; 
 	var min = 0; 
 	var max = 0;
-	MongoClient.connect(mongoUrl, function (err, db) {
+	console.log(currentId);
+	User.findOne({spotify_id: currentId}, function (err, currentUser) {
 		if (err) {
-			throw err;
+			console.log(err);
 		}
-		db.collection('users').findOne({spotify_id: currentId}, function(err, currentUser) {
-			if (err) { 
-				console.log(err);
+		var findJson = {
+			tracks:{'$exists':true}, 
+			spotify_id: {"$ne": currentUser.spotify_id}
+		}
+		User.find(findJson, function (err, users) {
+			for (var i = 0; i < users.length; i++) {
+
+				var user2 = users[i];						
+			    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
+		    	var artistsInCommon = getIntersection(currentUser.sorted_artists, user2.sorted_artists);
+		    	var total = artistsInCommon.length + tracksInCommon.length;
+		    	if (total > 1) {
+		    		if (user2.facebook_id) { 
+		    			var match = {
+		    				facebook_id: user2.facebook_id,
+		    				spotify_id: user2.spotify_id,
+		    				total: total, 
+		    				name: (user2.name.length > 0) ? user2.name: user2.spotify_id
+		    			}
+		    			matches.push(match);
+		    			if (total > highScore) { 
+		    				highScore = total;
+		    			}
+		    		}
+			    }   
 			}
-			var findJson = {
-				tracks:{'$exists':true}, 
-				spotify_id: {"$ne": currentUser.spotify_id}
-			}
-			db.collection('users').find(findJson, function (err, cursor) {
-				if (err) { 
-					console.log(err);
-				}
-				cursor.each(function(err, user2) {
-					if(user2  === null) {
-						db.close();
-						add_connections(currentUser.facebook_id, currentUser.spotify_id, matches, function (){
-							callback();
-						});
-					} else {					
-					    var tracksInCommon = getIntersection(currentUser.sorted_tracks, user2.sorted_tracks);
-				    	var artistsInCommon = getIntersection(currentUser.sorted_artists, user2.sorted_artists);
-				    	var total = artistsInCommon.length + tracksInCommon.length;
-				    	if (total > 1) {
-				    		if (user2.facebook_id) { 
-				    			var match = {
-				    				facebook_id: user2.facebook_id,
-				    				spotify_id: user2.spotify_id,
-				    				total: total, 
-				    				name: (user2.name.length > 0) ? user2.name: user2.spotify_id
-				    			}
-				    			matches.push(match);
-				    			if (total > highScore) { 
-				    				highScore = total;
-				    			}
-				    		}
-					    }   
-					}
-			  	});
-			});
+			add_connections(currentUser.facebook_id, currentUser.spotify_id, matches, function (){
+				callback();
+			});	
 		});
 	});
 };
 
+
 var add_connections = function (facebook_id, spotify_id, connections, callback) {
-	MongoClient.connect(mongoUrl, function (err, db) {
-		var options = {
-			upsert: true
-		}
+	var options = {
+		upsert: true
+	}
 
-		connections.sort(function(a, b) {
-		    return b.total - a.total;
-		});
+	connections.sort(function(a, b) {
+	    return b.total - a.total;
+	});
 
-		var setJson = {
-			facebook_id: facebook_id, 
-			spotify_id: spotify_id,
-			matches: connections.slice(0, 12)
-		}
-		console.log(spotify_id);
-		db.collection('matches').update({spotify_id: spotify_id}, setJson, options, function (err) {
-			if (err) {console.log(err);}
-			db.close();
-			callback();
-		}); 
-	});	
+	var setJson = {
+		facebook_id: facebook_id, 
+		spotify_id: spotify_id,
+		matches: connections.slice(0, 12)
+	}
+	console.log(spotify_id);
+	Match.update({spotify_id: spotify_id}, setJson, options, function (err) {
+		if (err) {console.log(err);}
+		callback();
+	}); 
 }
 
-MongoClient.connect(mongoUrl, function (err, db) {
-	db.collection('users').find({}).toArray(function (err, users) {
+
+var run = function () {
+	mongoose.connect(config.mongo_url);
+	User.find({}, function (err, users) {
 		if (err) {
 			console.log(err);
 		}
@@ -114,14 +109,19 @@ MongoClient.connect(mongoUrl, function (err, db) {
 				if (i < users.length) {
 					runScript(i)
 				} else {
-					console.log('Done');
+					console.log('Matches Completed');
 					console.log(highScore);
-					db.close();
+					mongoose.connection.close( function () {
+						calculateTopSongs.run();
+					});
+
 				}
 			});
 			
 		}
 		runScript(0);
 	}); 
+}
 
-});
+exports.run = run;
+

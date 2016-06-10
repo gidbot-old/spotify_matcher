@@ -1,7 +1,8 @@
 var MongoClient = require('mongodb').MongoClient
 , config = require('../config') 
 , mongoUrl = config.mongo_url
-, mongoose = require('mongoose');
+, mongoose = require('mongoose')
+, findMatches = require('./find_matches');
 
 var SpotifyWebApi = require('spotify-web-api-node');
 var clientId = 'a9b262c869aa4a9391f78deb6bc5af3d',
@@ -28,7 +29,9 @@ var updateBatch = function (limit, offset) {
 						if (users.length >= limit) {
 							updateBatch(limit, users.length);
 						} else {
-							mongoose.connection.close();
+							mongoose.connection.close(function () {
+								findMatches.run();
+							});
 							console.log("All Playlists Have Been Updated");
 						}
 					} 
@@ -108,10 +111,11 @@ function updatePlaylist (spotify_id, playlist_id, callback) {
 
 var d = new Date();
 var n = d.getDay();
-if (n == 4) {
+if (n == 1) {
 	mongoose.connect(config.mongo_url);
 	runUpdate();
 } else {
-	console.log("Not Monday");
+	console.log("Not Monday. Just Update Matches and Top Songs");
+	findMatches.run();
 }
 
