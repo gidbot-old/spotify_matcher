@@ -32,8 +32,8 @@ var run = function () {
 					console.log(err);
 				}
 				var count = 0; 
-				for (var i = 0; i < users.length; i++) {
-					var playlist = users[i];
+				for (var j = 0; j < users.length; j++) {
+					var playlist = users[j];
 					if (playlist.tracks){
 						var keys = Object.keys(playlist.tracks); 
 						for (var i = 0; i < keys.length; i++) {
@@ -79,9 +79,8 @@ var run = function () {
 				for (var i = 0; i < toReturn.length; i++) {
 					spotify_ids.push("spotify:track:" + toReturn[i].spotify_id);
 				}
-			
-				MongoClient.connect(mongoUrl, function (err, db) {
 
+				MongoClient.connect(mongoUrl, function (err, db) {
 					db.collection('top_tracks').insertOne(toSave, function (err) {
 						db.close();
 				
@@ -105,5 +104,7 @@ var run = function () {
 	});
 	
 }; 
+
+run();
 
 exports.run = run;
