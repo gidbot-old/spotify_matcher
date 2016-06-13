@@ -26,8 +26,12 @@ var updateBatch = function (limit, offset) {
 					num--;
 					if (num < 1) {
 						console.log('Playlist Batch Updated'); 
+						console.log("Limit: " , limit); 
+						console.log("Offset: " , offset); 
 						if (users.length >= limit) {
-							updateBatch(limit, users.length);
+							setTimeout(function () {
+								updateBatch(limit, users.length + offset);
+							}, 10000);
 						} else {
 							mongoose.connection.close(function () {
 								findMatches.run();
@@ -48,7 +52,7 @@ var runUpdate = function () {
 			.then(function (data) {
 				console.log("Spotify Token Updated");
 				spotifyApi.setAccessToken(data.body['access_token']);
-				updateBatch(50, 0); 
+				updateBatch(70, 0); 
 
 			}, function (err) {
 		    	console.log('Could not refresh access token', err);
