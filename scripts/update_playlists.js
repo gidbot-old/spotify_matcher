@@ -52,7 +52,7 @@ var runUpdate = function () {
 			.then(function (data) {
 				console.log("Spotify Token Updated");
 				spotifyApi.setAccessToken(data.body['access_token']);
-				updateBatch(70, 0); 
+				updateBatch(50, 0); 
 
 			}, function (err) {
 		    	console.log('Could not refresh access token', err);
