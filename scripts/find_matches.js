@@ -2,11 +2,20 @@ var MongoClient = require('mongodb').MongoClient
 , config = require('../config') 
 , mongoUrl = config.mongo_url
 , mongoose = require('mongoose')
-, calculateTopSongs = require('./calculate_top_songs');
+, calculateTopSongs = require('./calculate_top_songs')
+, Twitter = require('twitter');
 
 var User = require('../models/user');
 var LastWeek = require('../models/last_week');
 var Match = require('../models/match');
+var TopMatch = require('../models/top_match');
+
+var client = new Twitter({
+  consumer_key: config.twitter_consumer_key,
+  consumer_secret: config.twitter_consumer_secret,
+  access_token_key: config.twitter_access_token_key,
+  access_token_secret: config.twitter_access_token_secret
+});
 
 function getIntersection (array1, array2) {
 	var inCommon = [];	
@@ -94,6 +103,51 @@ var add_connections = function (facebook_id, spotify_id, connections, callback) 
 	}); 
 }
 
+var getTopMatch = function (callback) {
+	var d = new Date();
+	var n = d.getDay();
+	if (n == 1) {
+		Match.find({}, function (err, matches) {
+			var high = 0; 
+			var best = "";
+			
+			for (var i = 0; i < matches.length; i++) { 
+				if (matches[i].matches[0]) {
+					if (matches[i].matches[0].total > high) { 
+						best = matches[i].matches[0];
+						best["my_facebook_id"] = matches[i]["facebook_id"];
+						high = best.total;
+					}
+				}
+			}
+			var toSave = {
+				facebook_id_1: best["my_facebook_id"],
+	 			facebook_id_2: best["facebook_id"],
+	 			total: best["total"]
+			}
+
+			TopMatch.collection.insert(toSave, function () { 
+				console.log("Top Match Recorded");
+				var percent = (toSave["total"]/60*100).toFixed(2); 
+				var link = "https://www.discover-weekly.com/compare/" + toSave["facebook_id_1"] + "/" + toSave["facebook_id_2"];
+				var status = "With an overlap of " + percent + "%, this is our match of the week: " + link; 
+
+				client.post('statuses/update', {status: status},  function (error) {
+					if (error) { 
+						console.log(error);
+					} else {
+						console.log("Successfully Tweeted Top Match");
+					}
+					callback();
+				});
+			}); 
+
+		});
+	} else {
+		console.log("Only get top match on Mondays"); 
+		callback();
+	}
+}
 
 var run = function () {
 	mongoose.connect(config.mongo_url);
@@ -111,10 +165,11 @@ var run = function () {
 				} else {
 					console.log('Matches Completed');
 					console.log(highScore);
-					mongoose.connection.close( function () {
-						calculateTopSongs.run();
-					});
-
+					getTopMatch (function () {
+						mongoose.connection.close( function () {
+							calculateTopSongs.run();
+						});	
+					})
 				}
 			});
 			
