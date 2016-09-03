@@ -10,7 +10,7 @@ var LastWeek = require('../models/last_week');
 var Match = require('../models/match');
 var TopMatch = require('../models/top_match');
 
-var client = new Twitter({
+var twitterClient = new Twitter({
   consumer_key: config.twitter_consumer_key,
   consumer_secret: config.twitter_consumer_secret,
   access_token_key: config.twitter_access_token_key,
@@ -132,7 +132,7 @@ var getTopMatch = function (callback) {
 				var link = "https://www.discover-weekly.com/compare/" + toSave["facebook_id_1"] + "/" + toSave["facebook_id_2"];
 				var status = "With an overlap of " + percent + "%, this is our match of the week: " + link; 
 
-				client.post('statuses/update', {status: status},  function (error) {
+				twitterClient.post('statuses/update', {status: status},  function (error) {
 					if (error) { 
 						console.log(error);
 					} else {

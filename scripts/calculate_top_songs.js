@@ -1,6 +1,8 @@
 var MongoClient = require('mongodb').MongoClient
-, config = require('../config'); 
-var mongoUrl = config.mongo_url;
+, config = require('../config') 
+, mongoUrl = config.mongo_url
+, Twitter = require('twitter');
+
 
 var SpotifyWebApi = require('spotify-web-api-node');
 var clientId = 'a9b262c869aa4a9391f78deb6bc5af3d',
@@ -15,6 +17,34 @@ var spotifyApi = new SpotifyWebApi({
 var User = require('../models/user')
 , mongoose = require('mongoose');
 
+
+var twitterClient = new Twitter({
+  consumer_key: config.twitter_consumer_key,
+  consumer_secret: config.twitter_consumer_secret,
+  access_token_key: config.twitter_access_token_key,
+  access_token_secret: config.twitter_access_token_secret
+});
+ 
+var placement = [" "," 2nd "," 3rd "," 4th "," 5th "," 6th "," 7th "]; 
+var topTracks;
+
+function tweetTrack (callback) {
+	var d = new Date();
+	var n = d.getDay();
+	n = (n < 1) ? 7: n-1; 
+	var currentTrack = topTracks[n];
+	var link = "https://open.spotify.com/track/" + currentTrack.spotify_id;
+	var status = "Currently, the" +  placement[n] +'most popular track on Discover Weekly is "' + currentTrack.info.name + '" by ' + currentTrack.info.artist + ": "+ link; 
+
+	twitterClient.post('statuses/update', {status: status},  function (error) {
+		if (error) { 
+			console.log(error);
+		} else {
+			console.log("Successfully Tweeted Track for n=" + n);
+		}
+		callback();
+	});
+}
 
 
 var run = function () {
@@ -79,15 +109,20 @@ var run = function () {
 				for (var i = 0; i < toReturn.length; i++) {
 					spotify_ids.push("spotify:track:" + toReturn[i].spotify_id);
 				}
-
+				topTracks = toSave.tracks; 
 				MongoClient.connect(mongoUrl, function (err, db) {
 					db.collection('top_tracks').insertOne(toSave, function (err) {
 						db.close();
-				
+					
 						spotifyApi.replaceTracksInPlaylist('gideonbrosenthal', '1wzJHLrmgKdcRyMcwdSrDL', spotify_ids)
 						  .then(function(data) {
-						    console.log('Replaced Tracks in Playlist!');
-						    mongoose.connection.close();
+						  	console.log('Replaced Tracks in Playlist!');
+
+						  	tweetTrack (function () {
+							    console.log("Done with top tracks");
+							    mongoose.connection.close();
+						  	}); 
+
 						  }, function(err) {
 						    console.log('Something went wrong with replacing!', err);
 						  });
@@ -104,5 +139,7 @@ var run = function () {
 	});
 	
 }; 
+
+run();
 
 exports.run = run;
