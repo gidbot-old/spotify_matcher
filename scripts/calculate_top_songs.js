@@ -31,7 +31,7 @@ var topTracks;
 function tweetTrack (callback) {
 	var d = new Date();
 	var n = d.getDay();
-	n = (n < 1) ? 7: n-1; 
+	n = (n < 1) ? 6: n-1; 
 	var currentTrack = topTracks[n];
 	var link = "https://open.spotify.com/track/" + currentTrack.spotify_id;
 	var status = "Currently, the" +  placement[n] +'most popular track on Discover Weekly is "' + currentTrack.info.name + '" by ' + currentTrack.info.artist + ": "+ link; 
@@ -49,6 +49,7 @@ function tweetTrack (callback) {
 
 var run = function () {
 	mongoose.connect(config.mongo_url);
+	console.log("Updating Top Songs"); 
 
 	var tracks = {}; 
 	User.findOne({name: "Gideon Rosenthal"}, function (err, user) {		
@@ -139,7 +140,5 @@ var run = function () {
 	});
 	
 }; 
-
-run();
 
 exports.run = run;

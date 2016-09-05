@@ -13,7 +13,6 @@ var spotifyApi = new SpotifyWebApi({
 	  clientSecret: clientSecret	 
 	});
 
-
 var User = require('../models/user');
 var LastWeek = require('../models/last_week');
 
@@ -115,6 +114,7 @@ function updatePlaylist (spotify_id, playlist_id, callback) {
 
 var d = new Date();
 var n = d.getDay();
+console.log("Starting Script")
 if (n == 1) {
 	mongoose.connect(config.mongo_url);
 	runUpdate();
