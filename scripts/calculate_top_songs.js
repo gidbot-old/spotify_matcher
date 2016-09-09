@@ -34,7 +34,7 @@ function tweetTrack (callback) {
 	n = (n < 1) ? 6: n-1; 
 	var currentTrack = topTracks[n];
 	var link = "https://open.spotify.com/track/" + currentTrack.spotify_id;
-	var status = "Currently, the" +  placement[n] +'most popular track on Discover Weekly is "' + currentTrack.info.name + '" by ' + currentTrack.info.artist + ": "+ link; 
+	var status = "The" +  placement[n] +'most popular track on Discover Weekly right now is "' + currentTrack.info.name + '" by ' + currentTrack.info.artist + ": "+ link; 
 
 	twitterClient.post('statuses/update', {status: status},  function (error) {
 		if (error) { 
