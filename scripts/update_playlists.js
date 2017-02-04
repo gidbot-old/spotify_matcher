@@ -77,7 +77,7 @@ function saveLastWeek (user, callback) {
 function updatePlaylist (spotify_id, playlist_id, callback) {
 	var tracks = {};
 	var artists = {}; 
-	spotifyApi.getPlaylistTracks('spotifydiscover', playlist_id)
+	spotifyApi.getPlaylistTracks('spotify', playlist_id)
 	.then(function (data) {
 		for (var i = 0; i < data.body.items.length; i++) {
 			var item = data.body.items[i];

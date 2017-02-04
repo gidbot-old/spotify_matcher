@@ -196,7 +196,7 @@ router.get('/select-playlist', function (req, res) {
 			var items = data.body.items; 
 			var possible_playlists = []; 
 		    for (var i = 0; i < items.length; i++) {
-		    	if (items[i].owner.id == 'spotifydiscover') {
+		    	if (items[i].owner.id == 'spotify') {
 		    		var playlist = {
 		    			id: items[i].id, 
 		    			name: items[i].name,
