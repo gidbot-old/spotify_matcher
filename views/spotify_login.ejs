@@ -58,7 +58,7 @@ $(function() {
 	})
 	.then(function (playlist_id) {
 		statusBar.style.width = "50%";
-		return spotifyApi.getPlaylistTracks('spotifydiscover', playlist_id);
+		return spotifyApi.getPlaylistTracks('spotify', playlist_id);
 	})
 	.then(function (data) {
 		statusBar.style.width = "70%";
